@@ -19,7 +19,7 @@ This section will go over everything you need to know about API routes.
     
 The entries endpoint exposes Stream entries specified by the namespace and stream parameters.
 
-###Parameters
+### Parameters
 
 
 Key | Required | Type | Example | Description
@@ -33,7 +33,7 @@ stream | true | string | pages | The slug of the Stream you want to access entri
 
 The entries endpoint also exposes single Stream entries specified by the namespace, stream, and id parameters.
 
-###Parameters
+### Parameters
 
 Key | Required | Type | Example | Description
 --- | --- | --- | --- |---
@@ -43,9 +43,9 @@ id | true | integer | 10 | The ID of the entry you want to access within the pro
 
 <hr>
 
-##Example Authentication
+## Example Authentication
 
-######Request:
+###### Request:
 
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -71,7 +71,7 @@ id | true | integer | 10 | The ID of the entry you want to access within the pro
 
 
 
-######Response:
+###### Response:
 
         {
            "token_type": "Bearer",
@@ -82,9 +82,9 @@ id | true | integer | 10 | The ID of the entry you want to access within the pro
         
 <hr>
 
-##Example Create
+## Example Create
 
-######Request
+###### Request
         var myHeaders = new Headers();
         
         /**
@@ -124,7 +124,7 @@ id | true | integer | 10 | The ID of the entry you want to access within the pro
            .catch(error => console.log('error', error));
 
 
-######Response
+###### Response
 
         {
            "updated_by_id": null,
@@ -143,9 +143,9 @@ id | true | integer | 10 | The ID of the entry you want to access within the pro
         
 <hr>
 
-##Example Update
+## Example Update
 
-######Request
+###### Request
 
         var myHeaders = new Headers();
         
@@ -189,15 +189,15 @@ id | true | integer | 10 | The ID of the entry you want to access within the pro
            .catch(error => console.log('error', error));
            
            
-######Response
+###### Response
 
         true
         
 <hr>
 
-##Example Delete
+## Example Delete
 
-######Request
+###### Request
 
         var myHeaders = new Headers();
         
@@ -233,15 +233,15 @@ id | true | integer | 10 | The ID of the entry you want to access within the pro
            .catch(error => console.log('error', error));
 
 
-######Response
+###### Response
 
         true
         
 <hr>
 
-##Example List
+## Example List
 
-######Request
+###### Request
 
             var myHeaders = new Headers();
             
@@ -277,7 +277,7 @@ id | true | integer | 10 | The ID of the entry you want to access within the pro
 
 
 
-######Response
+###### Response
 
 
             {
@@ -346,10 +346,10 @@ id | true | integer | 10 | The ID of the entry you want to access within the pro
 
 <hr>
 
-##Example Detail Entry
+## Example Detail Entry
 
 
-######Request
+###### Request
 
             var myHeaders = new Headers();
             
@@ -385,7 +385,7 @@ id | true | integer | 10 | The ID of the entry you want to access within the pro
                .catch(error => console.log('error', error));
 
 
-######Response
+###### Response
 
 
             {
