@@ -32,16 +32,13 @@ class GenerateKeys
         $this->keys();
         $provider = in_array('users', array_keys(config('auth.providers'))) ? 'users' : null;
         $clients->createPasswordGrantClient(null, config('app.name').' Password Grant Client', 'http://localhost', $provider);
-
-        chmod(storage_path('streams/default/oauth-private.key'), 0600);
-        chmod(storage_path('streams/default/oauth-public.key'), 0600);
     }
 
     public function keys()
     {
         [$publicKey, $privateKey] = [
-            Passport::keyPath('oauth-public.key'),
-            Passport::keyPath('oauth-private.key'),
+            Passport::keyPath('streams/default/oauth-public.key'),
+            Passport::keyPath('streams/default/oauth-private.key'),
         ];
 
         if (class_exists(LegacyRSA::class)) {
@@ -56,5 +53,7 @@ class GenerateKeys
             file_put_contents($privateKey, (string)$key);
         }
 
+        chmod(storage_path('streams/default/oauth-private.key'), 0600);
+        chmod(storage_path('streams/default/oauth-public.key'), 0600);
     }
 }
