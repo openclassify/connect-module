@@ -137,7 +137,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
                 'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\EntriesController@show',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
-        )->where(['map' => '(.*)'])->middleware('auth:api');
+        )->where(['map' => '(.*)']);
 
         $router->put(
             'api/entries/{namespace}/{stream}/{id}',
