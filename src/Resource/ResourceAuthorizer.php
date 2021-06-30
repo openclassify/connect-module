@@ -64,7 +64,7 @@ class ResourceAuthorizer
             $permission = $namespace . '::' . $stream->getSlug() . '.read';
         }
 
-        if ($namespace != "visiosoft.module.advs" and !$this->authorizer->authorize($permission)) {
+        if (!$builder->getOption('read') and !$this->authorizer->authorize($permission)) {
             abort(403);
         }
     }
