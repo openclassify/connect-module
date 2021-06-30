@@ -61,6 +61,7 @@ class EntriesController extends ResourceController
         return $resource
             ->setId($this->route->parameter('id'))
             ->setOption('map', $this->route->parameter('map'))
+            ->setOption('read', true)
             ->response(
                 $this->route->parameter('namespace'),
                 $this->route->parameter('stream')
