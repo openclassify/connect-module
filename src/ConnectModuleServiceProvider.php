@@ -51,6 +51,8 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         'admin/connect'           => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@index',
         'admin/connect/create'    => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@create',
         'admin/connect/edit/{id}' => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@edit',
+        'api/login' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@login'
+
     ];
 
     /**
