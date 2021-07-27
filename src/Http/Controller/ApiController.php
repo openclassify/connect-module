@@ -47,7 +47,7 @@ class ApiController extends ResourceController
         $validator = Validator::make(request()->all(), [
             'email' => 'required|email|unique:users_users,email',
             'password' => 'required|max:55',
-            'display_name' => 'required|max:55'
+            'name' => 'required|max:55'
         ]);
 
         if ($validator->fails()) {
@@ -62,16 +62,22 @@ class ApiController extends ResourceController
                 'email' => $this->request->email,
                 'username' => $username,
                 'password' => $this->request->password,
-                'display_name' => $this->request->display_name,
-                'first_name' => array_first(explode(' ',$this->request->display_name)),
+                'display_name' => $this->request->name,
+                'first_name' => array_first(explode(' ',$this->request->name)),
             ]);
 
             $user->setAttribute('password', $this->request->password);
 
             $user->save();
 
+            $this->guard->login($user, false);
+
+
             return [
                 'success' => true,
+                'id' => $user->getId(),
+                'token' => app(\Visiosoft\ConnectModule\User\UserModel::class)->find(Auth::id())->createToken(Auth::id())->accessToken
+
             ];
         } catch (\Exception $e) {
             return [
