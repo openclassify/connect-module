@@ -51,6 +51,8 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         'admin/connect'           => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@index',
         'admin/connect/create'    => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@create',
         'admin/connect/edit/{id}' => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@edit',
+        'api/login' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@login',
+
     ];
 
     /**
@@ -122,6 +124,14 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
+
+        $router->post(
+            'api/register',
+            [
+                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\ApiController@register',
+                'streams::addon' => 'visiosoft.module.connect',
+            ]
+        );
 
         $router->post(
             'api/entries/{namespace}/{stream}',
