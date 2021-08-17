@@ -38,8 +38,9 @@ class GetResourceEntries
      */
     public function handle(Evaluator $evaluator)
     {
-        $model   = $this->builder->getModel();
+        $model = $this->builder->getModel();
         $entries = $this->builder->getEntries();
+        $search_type = $this->builder->getResourceOption('search_type', null);
 
         /**
          * If the builder has an entries handler
@@ -68,13 +69,33 @@ class GetResourceEntries
          */
         $repository = $this->builder->getRepository();
 
+
         /**
          * If the repository is an instance of
          * ResourceRepositoryInterface use it.
          */
         if ($repository instanceof ResourceRepositoryInterface) {
-            $entries = $repository->get($this->builder);
+
+            if ($search_type == "repository") {
+
+                $entries = $repository->getRepositoryEntries($this->builder);
+
+            } elseif ($search_type == "model") {
+
+                $entries = $repository->getModelEntries($this->builder);
+
+            } else {
+
+                $entries = $repository->get($this->builder);
+
+            }
+
         }
+
+        if ($entries instanceof EloquentModel) {
+            $entries = $entries->newCollection([$entries]);
+        }
+
 
         /**
          * Traverse the resource if a map is present.

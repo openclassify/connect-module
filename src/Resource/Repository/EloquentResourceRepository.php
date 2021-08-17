@@ -1,5 +1,6 @@
 <?php namespace Visiosoft\ConnectModule\Resource\Repository;
 
+use Anomaly\Streams\Platform\Entry\EntryQueryBuilder;
 use Visiosoft\ConnectModule\Resource\Contract\ResourceRepositoryInterface;
 use Visiosoft\ConnectModule\Resource\Event\ResourceIsQuerying;
 use Visiosoft\ConnectModule\Resource\ResourceBuilder;
@@ -56,6 +57,89 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
          */
         $query->select($this->model->getTable() . '.*');
 
+
+        return $this->returnQuerying($query, $builder);
+    }
+
+    public function getRepositoryEntries(ResourceBuilder $builder)
+    {
+        $model = $builder->getModel();
+
+        $search_parameters = $builder->getResourceOption("search_parameters", []);
+
+        $search_function = $builder->getResourceOption("search_function", null);
+
+
+        $query = $this->getRepositoryFunctions($model, $search_function, $search_parameters);
+
+        if ($query instanceof EntryQueryBuilder) {
+            return $this->returnQuerying($query, $builder);
+        }
+
+        return $query;
+    }
+
+    public function getModelEntries(ResourceBuilder $builder)
+    {
+        $model = $builder->getModel();
+
+        $search_parameters = $builder->getResourceOption("search_parameters", []);
+
+        $search_function = $builder->getResourceOption("search_function", null);
+
+
+        $query = $this->getModelFunctions($model, $search_function, $search_parameters);
+
+        if ($query instanceof EntryQueryBuilder) {
+            return $this->returnQuerying($query, $builder);
+        }
+
+        return $query;
+    }
+
+    public function getModelFunctions($model, $function_name, array $params = [])
+    {
+        try {
+            return call_user_func_array([app($model), camel_case($function_name)], $params);
+        } catch (\Exception $exception) {
+            echo json_encode(['message' => $exception->getMessage()]);
+            die;
+        }
+    }
+
+    public function getRepositoryFunctions($model, $function_name, array $params = [])
+    {
+        try {
+            if ($model = call_user_func_array([app($model), camel_case('getRepository')], [])) {
+                return call_user_func_array([app($model), $function_name], $params);
+            }
+        } catch (\Exception $exception) {
+            echo json_encode(['message' => $exception->getMessage()]);
+            die;
+        }
+    }
+
+    public function returnQuerying($query, $builder)
+    {
+        /**
+         * It allows you to add your Query Conditions.
+         */
+
+        $query_conditions = $builder->getResourceOption('where', "{}");
+
+
+        if ($query_conditions = json_decode($query_conditions, true) and is_array($query_conditions)) {
+            foreach ($query_conditions as $item_where) {
+                if (isset($item_where['column']) && isset($item_where['value'])) {
+
+                    $operator = (isset($item_where['operator'])) ? $item_where['operator'] : "=";
+
+                    $query->where($item_where['column'], $operator, $item_where['value']);
+
+                }
+            }
+        }
+
         /**
          * Eager load any relations to
          * save resources and queries.
@@ -92,8 +176,8 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
          * not exist then start walking backwards until
          * we find a page that is has something to show us.
          */
-        $limit  = $builder->getResourceOption('limit', 100);
-        $page   = app('request')->get('page', 1);
+        $limit = $builder->getResourceOption('limit', 100);
+        $page = app('request')->get('page', 1);
         $offset = $limit * ($page - 1);
 
         if ($total < $offset && $page > 1) {
@@ -113,6 +197,7 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
         /**
          * Order the query results.
          */
+
         foreach ($builder->getResourceOption('order_by') as $formatter => $direction) {
             $query->orderBy($formatter, $direction);
         }

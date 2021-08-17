@@ -19,4 +19,12 @@ interface ResourceRepositoryInterface
      * @return Collection
      */
     public function get(ResourceBuilder $builder);
+
+    public function getRepositoryEntries(ResourceBuilder $builder);
+
+    public function getModelEntries(ResourceBuilder $builder);
+
+    public function getModelFunctions($model, $function_name, array $params = []);
+
+    public function getRepositoryFunctions($model, $function_name, array $params = []);
 }
