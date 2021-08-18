@@ -20,6 +20,8 @@ interface ResourceRepositoryInterface
      */
     public function get(ResourceBuilder $builder);
 
+    public function getRepositoryWithModel($model);
+
     public function getRepositoryEntries(ResourceBuilder $builder);
 
     public function getModelEntries(ResourceBuilder $builder);
@@ -27,4 +29,6 @@ interface ResourceRepositoryInterface
     public function getModelFunctions($model, $function_name, array $params = []);
 
     public function getRepositoryFunctions($model, $function_name, array $params = []);
+
+    public function returnQuerying($query, $builder);
 }
