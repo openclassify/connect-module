@@ -11,7 +11,6 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 /**
  * Class EloquentResourceRepository
  *
-
  * @package       Visiosoft\ConnectModule\Resource\Repository
  */
 class EloquentResourceRepository implements ResourceRepositoryInterface
@@ -107,12 +106,22 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
         }
     }
 
+    public function getRepositoryWithModel($model)
+    {
+        $model = get_class(app($model));
+        $modelNamespace = explode('\\', $model);
+        $modelName = array_pop($modelNamespace);
+        preg_match('/^(.*)Model$/', $modelName, $m);
+        $modelName = $m[1];
+        $repoNamespace = implode('\\', $modelNamespace);
+
+        return "$repoNamespace\Contract\\{$modelName}RepositoryInterface";
+    }
+
     public function getRepositoryFunctions($model, $function_name, array $params = [])
     {
         try {
-            if ($model = call_user_func_array([app($model), camel_case('getRepository')], [])) {
-                return call_user_func_array([app($model), $function_name], $params);
-            }
+            return call_user_func_array([app($this->getRepositoryWithModel($model)), camel_case($function_name)], $params);
         } catch (\Exception $exception) {
             echo json_encode(['message' => $exception->getMessage()]);
             die;
