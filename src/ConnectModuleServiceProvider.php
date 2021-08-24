@@ -172,6 +172,28 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
+
+
+
+
+
+        // Function Routes
+        $router->get(
+            'api/function/{namespace}/{stream}/{function}',
+            [
+                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\FunctionController@index',
+                'streams::addon' => 'visiosoft.module.connect',
+            ]
+        )->middleware('auth:api');
+
+        $router->post(
+            'api/function/{namespace}/{stream}/{function}',
+            [
+                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\FunctionController@store',
+                'streams::addon' => 'visiosoft.module.connect',
+            ]
+        )->middleware('auth:api');
+
     }
 
     /**

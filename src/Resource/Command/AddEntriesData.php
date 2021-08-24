@@ -46,7 +46,8 @@ class AddEntriesData
             $this->builder->getResourceResults()->all()
         );
 
-        if ($this->builder->getId()) {
+
+        if ($this->builder->getId() || !count($this->builder->getResourceEntries())) {
             $this->builder->addResourceData('data', array_shift($entries));
         } else {
 

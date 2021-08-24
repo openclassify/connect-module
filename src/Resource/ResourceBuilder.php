@@ -52,6 +52,13 @@ class ResourceBuilder
     protected $id = null;
 
     /**
+     * The ID to retrieve.
+     *
+     * @var null|int
+     */
+    protected $function = null;
+
+    /**
      * The entries handler.
      *
      * @var null|string
@@ -223,6 +230,30 @@ class ResourceBuilder
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+
+    /**
+     * Get the Function.
+     *
+     * @return string|null
+     */
+    public function getFunction()
+    {
+        return $this->function;
+    }
+
+    /**
+     * Set the Function.
+     *
+     * @param $function
+     * @return $this
+     */
+    public function setFunction($function)
+    {
+        $this->function = $function;
 
         return $this;
     }

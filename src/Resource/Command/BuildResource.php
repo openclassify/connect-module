@@ -63,5 +63,6 @@ class BuildResource
          * Lastly resource results.
          */
         $this->dispatch(new BuildResults($this->builder));
+
     }
 }

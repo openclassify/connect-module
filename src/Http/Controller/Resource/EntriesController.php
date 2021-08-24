@@ -1,6 +1,8 @@
 <?php namespace Visiosoft\ConnectModule\Http\Controller\Resource;
+
 use Anomaly\PostsModule\Category\Contract\CategoryRepositoryInterface;
 
+use Visiosoft\ConnectModule\Command\GetRepository;
 use Visiosoft\ConnectModule\Resource\ResourceBuilder;
 use Anomaly\Streams\Platform\Entry\EntryRepository;
 use Anomaly\Streams\Platform\Http\Controller\ResourceController;
@@ -9,7 +11,6 @@ use Anomaly\Streams\Platform\Stream\Contract\StreamRepositoryInterface;
 /**
  * Class EntriesController
  *
-
  * @package       Visiosoft\ConnectModule\Http\Resource
  */
 class EntriesController extends ResourceController
@@ -39,14 +40,40 @@ class EntriesController extends ResourceController
     {
         $attributes = $this->request->except('access_token');
 
+
         $stream = $streams->findBySlugAndNamespace(
             $this->route->parameter('stream'),
             $this->route->parameter('namespace')
         );
 
-       $repository = (new EntryRepository())->setModel($stream->getEntryModel());
-      //$repository = app(CategoryRepositoryInterface::class);
-      
+        $repository = $this->dispatch(new GetRepository($stream->getEntryModelName()));
+
+        $search_type = $this->getOption('search_type');
+        $search_function = $this->getOption('search_function');
+        $search_parameters = $this->getOption('search_parameters');
+
+        if ($search_function) {
+
+            try {
+                switch ($search_type) {
+
+                    case "model":
+                        $entry = call_user_func_array([$stream->getEntryModel(), camel_case($search_function)], $search_parameters);
+                        break;
+
+                    default:
+                        $entry = call_user_func_array([$repository, camel_case($search_function)], $search_parameters);
+
+                }
+
+                return $this->response->json(['status' => ($entry) ? true : false]);
+
+            } catch (\Exception $exception) {
+                return $this->response->json(['status' => false, 'message' => $exception->getMessage()]);
+            }
+            die;
+        }
+
         return $this->response->json($repository->create($attributes));
     }
 
@@ -108,5 +135,19 @@ class EntriesController extends ResourceController
         $entry = $repository->find($this->route->parameter('id'));
 
         return $this->response->json($repository->delete($entry));
+    }
+
+    public function getRequestOptions()
+    {
+        return $this->request->get('options', []);
+    }
+
+    public function getOption($key, $default = null)
+    {
+        if (array_key_exists($key, $this->getRequestOptions())) {
+            return $this->getRequestOptions()[$key];
+        }
+
+        return value($default);
     }
 }
