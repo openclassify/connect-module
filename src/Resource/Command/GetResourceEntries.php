@@ -1,5 +1,7 @@
 <?php namespace Visiosoft\ConnectModule\Resource\Command;
 
+use Anomaly\Streams\Platform\Support\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Visiosoft\ConnectModule\Resource\Contract\ResourceRepositoryInterface;
 use Visiosoft\ConnectModule\Resource\ResourceBuilder;
 use Anomaly\Streams\Platform\Model\EloquentCollection;
@@ -10,7 +12,6 @@ use Anomaly\Streams\Platform\Support\Evaluator;
 /**
  * Class GetResourceEntries
  *
-
  * @package       Visiosoft\ConnectModule\Resource\Command
  */
 class GetResourceEntries
@@ -76,13 +77,9 @@ class GetResourceEntries
          */
         if ($repository instanceof ResourceRepositoryInterface) {
 
-            if ($search_type == "repository") {
+            if ($this->builder->getFunction()) {
 
                 $entries = $repository->getRepositoryEntries($this->builder);
-
-            } elseif ($search_type == "model") {
-
-                $entries = $repository->getModelEntries($this->builder);
 
             } else {
 
@@ -94,6 +91,14 @@ class GetResourceEntries
 
         if ($entries instanceof EloquentModel) {
             $entries = $entries->newCollection([$entries]);
+        }
+
+        if ($entries instanceof BelongsToMany) {
+            $entries = $entries->get();
+        }
+
+        if (!$entries) {
+            $entries = new Collection();
         }
 
 

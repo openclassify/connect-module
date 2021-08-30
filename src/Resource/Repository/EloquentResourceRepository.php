@@ -64,30 +64,11 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
     {
         $model = $builder->getModel();
 
-        $search_parameters = $builder->getResourceOption("search_parameters", []);
+        $search_parameters = $builder->getResourceOption("parameters", []);
 
-        $search_function = $builder->getResourceOption("search_function", null);
-
+        $search_function = $builder->getFunction();
 
         $query = $this->getRepositoryFunctions($model, $search_function, $search_parameters);
-
-        if ($query instanceof EntryQueryBuilder) {
-            return $this->returnQuerying($query, $builder);
-        }
-
-        return $query;
-    }
-
-    public function getModelEntries(ResourceBuilder $builder)
-    {
-        $model = $builder->getModel();
-
-        $search_parameters = $builder->getResourceOption("search_parameters", []);
-
-        $search_function = $builder->getResourceOption("search_function", null);
-
-
-        $query = $this->getModelFunctions($model, $search_function, $search_parameters);
 
         if ($query instanceof EntryQueryBuilder) {
             return $this->returnQuerying($query, $builder);
@@ -101,7 +82,7 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
         try {
             return call_user_func_array([app($model), camel_case($function_name)], $params);
         } catch (\Exception $exception) {
-            echo json_encode(['message' => $exception->getMessage()]);
+            echo json_encode(['status' => false, 'message' => $exception->getMessage()]);
             die;
         }
     }
@@ -121,9 +102,10 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
     public function getRepositoryFunctions($model, $function_name, array $params = [])
     {
         try {
-            return call_user_func_array([app($this->getRepositoryWithModel($model)), camel_case($function_name)], $params);
+            return call_user_func([app($this->getRepositoryWithModel($model)), camel_case($function_name)], $params);
         } catch (\Exception $exception) {
-            echo json_encode(['message' => $exception->getMessage()]);
+            header('Content-Type: application/json');
+            echo json_encode(['status' => false, 'message' => $exception->getMessage()]);
             die;
         }
     }
