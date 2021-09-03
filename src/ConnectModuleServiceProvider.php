@@ -149,7 +149,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
             ]
         )->where(['map' => '(.*)']);
 
-        $router->put(
+        $router->post(
             'api/entries/{namespace}/{stream}/{id}',
             [
                 'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\EntriesController@update',
