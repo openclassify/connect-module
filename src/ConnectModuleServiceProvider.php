@@ -166,8 +166,8 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
             ]
         )->middleware('auth:api');
 
-        $router->delete(
-            'api/entries/{namespace}/{stream}/{id}',
+        $router->post(
+            'api/delete-entries/{namespace}/{stream}/{id}',
             [
                 'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\EntriesController@delete',
                 'streams::addon' => 'visiosoft.module.connect',
