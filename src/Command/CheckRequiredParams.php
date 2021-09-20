@@ -17,7 +17,7 @@ class CheckRequiredParams
     {
         foreach ($this->required_params as $required) {
             if (!array_key_exists($required, $this->params)) {
-                throw new \Exception(trans('visiosoft.module.organizations::message.required_parameter', ['parameter' => $required]));
+                throw new \Exception(trans('visiosoft.module.connect::message.required_parameter', ['parameter' => $required]));
                 die;
             }
         }
