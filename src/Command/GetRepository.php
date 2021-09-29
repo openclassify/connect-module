@@ -11,10 +11,17 @@ class GetRepository
 
     public function handle()
     {
-        return $this->getRepositoryWithModel($this->model);
+
+        $collection_class = $this->getApiCollectionClassWithModel($this->model);
+
+        if (class_exists($collection_class)) {
+            return app($this->getApiCollectionClassWithModel($this->model));
+        }
+
+        return app($this->getRepositoryClassWithModel($this->model));
     }
 
-    public function getRepositoryWithModel($model)
+    public function getRepositoryClassWithModel($model)
     {
         $model = get_class(app($model));
         $modelNamespace = explode('\\', $model);
@@ -23,6 +30,20 @@ class GetRepository
         $modelName = $m[1];
         $repoNamespace = implode('\\', $modelNamespace);
 
-        return app("$repoNamespace\Contract\\{$modelName}RepositoryInterface");
+        return "$repoNamespace\Contract\\{$modelName}RepositoryInterface";
     }
+
+    public function getApiCollectionClassWithModel($model)
+    {
+        $model = get_class(app($model));
+        $modelNamespace = explode('\\', $model);
+        $modelName = array_pop($modelNamespace);
+        preg_match('/^(.*)Model$/', $modelName, $m);
+        $modelName = $m[1];
+        $repoNamespace = implode('\\', $modelNamespace);
+
+        return "$repoNamespace\\{$modelName}ApiCollection";
+    }
+
+
 }
