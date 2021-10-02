@@ -35,7 +35,7 @@ class FunctionController extends ResourceController
             $entry = call_user_func([$repository, camel_case($function)], $parameters);
 
         } catch (\Exception $exception) {
-            return $this->response->json(['status' => false, 'message' => $exception->getMessage()]);
+            return $this->response->json(['status' => false, 'message' => $exception->getMessage(),'error_code' => $exception->getCode()]);
             die;
         }
 
