@@ -99,10 +99,38 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
         return "$repoNamespace\Contract\\{$modelName}RepositoryInterface";
     }
 
+    public function getApiCollectionWithModel($model)
+    {
+        $model = get_class($model);
+        $modelNamespace = explode('\\', $model);
+        $modelName = array_pop($modelNamespace);
+        preg_match('/^(.*)Model$/', $modelName, $m);
+        $modelName = $m[1];
+        $repoNamespace = implode('\\', $modelNamespace);
+
+        return "$repoNamespace\\{$modelName}ApiCollection";
+    }
+
     public function getRepositoryFunctions($model, $function_name, array $params = [])
     {
+
         try {
-            return call_user_func([app($this->getRepositoryWithModel($model)), camel_case($function_name)], $params);
+
+            $collection_class = $this->getApiCollectionWithModel($this->model);
+
+            // Default set Repository
+            $class = app($this->getRepositoryWithModel($model));
+
+            if (class_exists($collection_class)) {
+
+                // Set ApiCollection
+                $class = app($collection_class);
+            }
+
+
+            return call_user_func([$class, camel_case($function_name)], $params);
+
+
         } catch (\Exception $exception) {
             header('Content-Type: application/json');
             echo json_encode(['status' => false, 'message' => $exception->getMessage()]);
@@ -185,10 +213,21 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
 
         $query->take($limit)->offset($offset);
 
+
+
+//        dd($builder->getResourceOption('filters'),$builder->getResourceOption('order_by'),$builder->getFilters(),$builder->getOption('filter'));
+        /**
+         * Where clauses
+         */
+        if ($builder->getResourceOption('filters')) {
+            foreach ($builder->getResourceOption('filters') as $filter => $filter_value) {
+                $query->where($filter, $filter_value);
+            }
+        }
+
         /**
          * Order the query results.
          */
-
         foreach ($builder->getResourceOption('order_by') as $formatter => $direction) {
             $query->orderBy($formatter, $direction);
         }

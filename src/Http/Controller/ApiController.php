@@ -43,7 +43,7 @@ class ApiController extends ResourceController
             }
         }
 
-        return $this->response->json(['error' => true, 'message' => trans('visiosoft.module.connect::message.error_auth')], 401);
+        return $this->response->json(['error' => true, 'message' => trans('visiosoft.module.connect::message.error_auth')]);
     }
 
     public function register()
