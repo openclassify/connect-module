@@ -4,10 +4,12 @@ use Anomaly\Streams\Platform\Http\Controller\ResourceController;
 use Anomaly\UsersModule\User\Contract\UserInterface;
 use Anomaly\UsersModule\User\Contract\UserRepositoryInterface;
 use Anomaly\UsersModule\User\UserPassword;
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\Guard;
 use Anomaly\UsersModule\User\UserAuthenticator;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -62,17 +64,17 @@ class ApiController extends ResourceController
 
             $username = Str::slug(preg_replace('/@.*?$/', '', $this->request->email) . rand(0, 999999));
 
-            $user = $this->userRepository->create([
+            $user_id = DB::table('users_users')->insertGetId([
                 'email' => $this->request->email,
+                'created_at' => Carbon::now(),
+                'str_id' => str_random(24),
                 'username' => $username,
-                'password' => $this->request->password,
+                'password' => app('hash')->make($this->request->password),
                 'display_name' => $this->request->name,
                 'first_name' => array_first(explode(' ', $this->request->name)),
             ]);
 
-            $user->setAttribute('password', $this->request->password);
-
-            $user->save();
+            $user = $this->userRepository->find($user_id);
 
             $this->guard->login($user, false);
 
