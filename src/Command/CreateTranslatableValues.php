@@ -1,0 +1,50 @@
+<?php namespace Visiosoft\ConnectModule\Command;
+
+class CreateTranslatableValues
+{
+    protected $params;
+
+    public function __construct(array $params)
+    {
+        $this->params = $params;
+    }
+
+    public function handle()
+    {
+        $new_parameters = [];
+        foreach ($this->params as $key => $value) {
+            $new_parameters = array_merge_recursive($new_parameters, $this->createValue($key, $value));
+        }
+
+        return $new_parameters;
+    }
+
+    public function enabledLocales()
+    {
+        $enabled_locales = config('streams::locales.enabled', setting_value('streams::enabled_locales', []));
+        $default_locale = config('streams::locales.default', setting_value('streams::default_locale'));
+
+        if ($default_locale and !in_array($default_locale, $enabled_locales)) {
+            array_push($enabled_locales, config('streams::locales.default', setting_value('streams::default_locale')));
+        }
+
+        return $enabled_locales;
+    }
+
+    public function createValue($key, $value)
+    {
+        if (is_array($value)) {
+            $new_parameters = [];
+
+            foreach ($this->enabledLocales() as $locale) {
+                if (isset($value[$locale])) {
+                    $new_parameters[$locale][$key] = $value[$locale];
+                }
+            }
+
+            return $new_parameters;
+        }
+
+        return [$key => $value];
+    }
+}

@@ -66,6 +66,11 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
 
         $search_parameters = $builder->getResourceOption("parameters", []);
 
+        if ($builder->getId())
+        {
+            $search_parameters['id'] = $builder->getId();
+        }
+
         $search_function = $builder->getFunction();
 
         $query = $this->getRepositoryFunctions($model, $search_function, $search_parameters);
@@ -177,7 +182,7 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
          * If a specific ID is desired than return
          * it now since we've already filtered.
          */
-        if ($id = $builder->getId()) {
+        if ($id = $builder->getId() and !$builder->getFunction()) {
             return $query->where($this->model->getTable() . '.id', $id)->get();
         }
 

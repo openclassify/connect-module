@@ -17,6 +17,17 @@ class FunctionController extends ResourceController
             );
     }
 
+    public function show(ResourceBuilder $resources)
+    {
+        return $resources
+            ->setFunction($this->route->parameter('function'))
+            ->setId($this->route->parameter('id'))
+            ->response(
+                $this->route->parameter('namespace'),
+                $this->route->parameter('stream')
+            );
+    }
+
     public function store(StreamRepositoryInterface $streams)
     {
         $stream = $streams->findBySlugAndNamespace(
