@@ -180,6 +180,14 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
 
         // Function Routes
         $router->get(
+            'api/function/{namespace}/{stream}/{function}/{id}',
+            [
+                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\FunctionController@show',
+                'streams::addon' => 'visiosoft.module.connect',
+            ]
+        )->middleware('auth:api');
+
+        $router->get(
             'api/function/{namespace}/{stream}/{function}',
             [
                 'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\FunctionController@index',
