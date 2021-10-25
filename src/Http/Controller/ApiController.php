@@ -53,6 +53,7 @@ class ApiController extends ResourceController
         $validator = Validator::make(request()->all(), [
             'email' => 'required|email|unique:users_users,email',
             'password' => 'required|max:55',
+            'username' => 'required|max:20|unique:users_users,username',
             'name' => 'required|max:55'
         ]);
 
@@ -62,13 +63,11 @@ class ApiController extends ResourceController
 
         try {
 
-            $username = Str::slug(preg_replace('/@.*?$/', '', $this->request->email) . rand(0, 999999));
-
             $user_id = DB::table('users_users')->insertGetId([
                 'email' => $this->request->email,
                 'created_at' => Carbon::now(),
                 'str_id' => str_random(24),
-                'username' => $username,
+                'username' => $this->request->username,
                 'password' => app('hash')->make($this->request->password),
                 'display_name' => $this->request->name,
                 'first_name' => array_first(explode(' ', $this->request->name)),
