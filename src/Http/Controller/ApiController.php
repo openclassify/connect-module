@@ -45,9 +45,10 @@ class ApiController extends ResourceController
 
         if ($response = $this->authenticator->authenticate($request_parameters)) {
             if ($response instanceof UserInterface) {
-                $this->guard->login($response, false);
+                $u_id = $response->id;
                 $response = ['id' => $response->getId()];
-                $response['token'] = app(\Visiosoft\ConnectModule\User\UserModel::class)->find(Auth::id())->createToken(Auth::id())->accessToken;
+                $response['token'] = app(\Visiosoft\ConnectModule\User\UserModel::class)->find($u_id)->createToken($u_id)->accessToken;
+
                 return $this->response->json($response);
             }
         }
