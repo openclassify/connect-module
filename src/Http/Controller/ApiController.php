@@ -53,7 +53,7 @@ class ApiController extends ResourceController
             }
         }
 
-        return $this->response->json(['error' => true, 'message' => trans('visiosoft.module.connect::message.error_auth')]);
+        return $this->response->json(['success' => false, 'message' => trans('visiosoft.module.connect::message.error_auth')],400);
     }
 
     public function register()
@@ -66,7 +66,7 @@ class ApiController extends ResourceController
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return response()->json($validator->errors(), 400);
         }
 
         try {
@@ -85,18 +85,14 @@ class ApiController extends ResourceController
 
             $this->guard->login($user, false);
 
-
             return [
                 'success' => true,
                 'id' => $user->getId(),
                 'token' => app(\Visiosoft\ConnectModule\User\UserModel::class)->find(Auth::id())->createToken(Auth::id())->accessToken
+            ];
 
-            ];
         } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'msg' => $e->getMessage()
-            ];
+            return $this->response->json(['success' => false, 'message' => $e->getMessage()],400);
         }
     }
 
@@ -142,11 +138,7 @@ class ApiController extends ResourceController
                 return ['success' => true];
 
             } catch (\Exception $e) {
-
-                return [
-                    'success' => false,
-                    'msg' => $e->getMessage()
-                ];
+                return $this->response->json(['success' => false, 'message' => $e->getMessage()],400);
             }
         }
 
@@ -167,9 +159,7 @@ class ApiController extends ResourceController
 
         } catch (\Exception $e) {
 
-            return [
-                'success' => false,
-            ];
+            return $this->response->json(['success' => false, 'message' => $e->getMessage()],400);
         }
     }
 
@@ -204,10 +194,7 @@ class ApiController extends ResourceController
             ];
 
         } catch (\Exception $exception) {
-            return [
-                'success' => false,
-                'message' => $exception->getMessage()
-            ];
+            return $this->response->json(['success' => false, 'message' => $exception->getMessage()],400);
         }
     }
 

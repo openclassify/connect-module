@@ -69,7 +69,7 @@ class EntriesController extends ResourceController
                 return $this->response->json(['status' => ($entry) ? true : false]);
 
             } catch (\Exception $exception) {
-                return $this->response->json(['status' => false, 'message' => $exception->getMessage()]);
+                return $this->response->json(['status' => false, 'message' => $exception->getMessage()],400);
             }
             die;
         }
