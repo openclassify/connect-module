@@ -36,7 +36,14 @@ class ApiController extends ResourceController
 
     public function login()
     {
-        if ($response = $this->authenticator->authenticate($this->request->toArray())) {
+        $request_parameters = $this->request->toArray();
+
+        if (isset($request_parameters['email']) && !filter_var(request('email'), FILTER_VALIDATE_EMAIL)) {
+            $request_parameters['username'] = $request_parameters['email'];
+            unset($request_parameters['email']);
+        }
+
+        if ($response = $this->authenticator->authenticate($request_parameters)) {
             if ($response instanceof UserInterface) {
                 $this->guard->login($response, false);
                 $response = ['id' => $response->getId()];
