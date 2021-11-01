@@ -56,6 +56,11 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         'api/renew-password' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@renew',
     ];
 
+    protected $bindings = [
+        'Anomaly\Streams\Platform\Exception\ExceptionHandler' => 'Visiosoft\ConnectModule\Exceptions\ExceptionHandler'
+
+    ];
+
     /**
      * Register the addon.
      *
