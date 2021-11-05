@@ -38,6 +38,13 @@ class HydrateFromRequest
      */
     public function handle(Hydrator $hydrator, Request $request)
     {
+        $functional_options = $this->builder->getOptions();
+
         $hydrator->hydrate($this->builder, $request->all());
+
+        // include functional options
+        foreach ($functional_options as $key => $option) {
+            $this->builder->setOption($key, $option);
+        }
     }
 }
