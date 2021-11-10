@@ -52,6 +52,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         'admin/connect/create'    => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@create',
         'admin/connect/edit/{id}' => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@edit',
         'api/login' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@login',
+        'api/register' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@register',
         'api/forgot-password' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@forgotPassword',
         'api/renew-password' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@renew',
     ];
@@ -130,14 +131,6 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
-
-        $router->post(
-            'api/register',
-            [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\ApiController@register',
-                'streams::addon' => 'visiosoft.module.connect',
-            ]
-        );
 
         $router->post(
             'api/entries/{namespace}/{stream}',

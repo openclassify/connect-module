@@ -3,6 +3,7 @@
 use Anomaly\Streams\Platform\Http\Controller\ResourceController;
 use Anomaly\UsersModule\User\Contract\UserInterface;
 use Anomaly\UsersModule\User\Contract\UserRepositoryInterface;
+use Anomaly\UsersModule\User\UserActivator;
 use Anomaly\UsersModule\User\UserPassword;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\Guard;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Visiosoft\ConnectModule\Notification\ActivateYourAccount;
 use Visiosoft\ConnectModule\Notification\ResetYourPassword;
 
 
@@ -46,8 +48,7 @@ class ApiController extends ResourceController
         if ($response = $this->authenticator->authenticate($request_parameters)) {
             if ($response instanceof UserInterface) {
 
-                if (!$response->isActivated() or !$response->isEnabled())
-                {
+                if (!$response->isActivated() or !$response->isEnabled()) {
                     return $this->response->json(['success' => false, 'message' => trans('visiosoft.module.connect::message.disabled_account')], 400);
                 }
 
@@ -64,40 +65,99 @@ class ApiController extends ResourceController
 
     public function register()
     {
+        $encrypter = app(Encrypter::class);
+        $users = app(UserRepositoryInterface::class);
+
+        // Forgot Request
+        if (!$this->request->has('token')) {
+
+            $validator = Validator::make(request()->all(), [
+                'email' => 'required|email|unique:users_users,email',
+                'password' => 'required|max:55',
+                'username' => 'required|max:20|unique:users_users,username',
+                'name' => 'required|max:55',
+                'callback' => 'required',
+                'success-params' => 'required',
+                'error-params' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 400);
+            }
+
+            try {
+
+                $user_id = DB::table('users_users')->insertGetId([
+                    'email' => $this->request->email,
+                    'created_at' => Carbon::now(),
+                    'str_id' => str_random(24),
+                    'username' => $this->request->username,
+                    'password' => app('hash')->make($this->request->password),
+                    'display_name' => $this->request->name,
+                    'first_name' => array_first(explode(' ', $this->request->name)),
+                ]);
+
+                $user = $this->userRepository->find($user_id);
+
+                $user->setAttribute('activation_code', str_random(40));
+                $user->save();
+
+                $parameters['token'] = $encrypter->encrypt($user->getActivationCode());
+                $parameters['success-verification'] = $encrypter->encrypt($this->request->get('success-params'));
+                $parameters['error-verification'] = $encrypter->encrypt($this->request->get('error-params'));
+                $parameters['redirect'] = $encrypter->encrypt($this->request->callback);
+                $parameters['email'] = $encrypter->encrypt($user->email);
+
+                $url = url('api/register') . '?' . http_build_query($parameters);
+
+                $user->notify(new ActivateYourAccount($url));
+
+                return [
+                    'success' => true,
+                    'message' => trans('visiosoft.module.connect::message.pending_email_activation')
+                ];
+
+            } catch (\Exception $e) {
+                return $this->response->json(['success' => false, 'message' => $e->getMessage()], 400);
+            }
+        }
+
         $validator = Validator::make(request()->all(), [
-            'email' => 'required|email|unique:users_users,email',
-            'password' => 'required|max:55',
-            'username' => 'required|max:20|unique:users_users,username',
-            'name' => 'required|max:55'
+            'success-verification' => 'required',
+            'error-verification' => 'required',
+            'token' => 'required',
+            'redirect' => 'required',
+            'email' => 'required',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
 
+        // Redirect Request
         try {
+            $activator = app(UserActivator::class);
 
-            $user_id = DB::table('users_users')->insertGetId([
-                'email' => $this->request->email,
-                'created_at' => Carbon::now(),
-                'str_id' => str_random(24),
-                'username' => $this->request->username,
-                'password' => app('hash')->make($this->request->password),
-                'display_name' => $this->request->name,
-                'first_name' => array_first(explode(' ', $this->request->name)),
-            ]);
+            $callback = $encrypter->decrypt($this->request->redirect);
 
-            $user = $this->userRepository->find($user_id);
+            $success = $encrypter->decrypt($this->request->get('success-verification'));
+            $error = $encrypter->decrypt($this->request->get('error-verification'));
 
-            $this->guard->login($user, false);
 
-            return [
-                'success' => true,
-                'id' => $user->getId(),
-                'token' => app(\Visiosoft\ConnectModule\User\UserModel::class)->find(Auth::id())->createToken(Auth::id())->accessToken
-            ];
+
+            if ($user = $users->findBy('email', $encrypter->decrypt($this->request->email))
+            and $activator->activate($user, $encrypter->decrypt($this->request->token))) {
+
+                $callback = $this->generateCallback($callback, ['code' => $this->request->token], $success);
+            } else {
+
+                $callback = $this->generateCallback($callback, [], $error);
+            }
+
+            return Redirect::to($callback);
 
         } catch (\Exception $e) {
+
             return $this->response->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
@@ -109,7 +169,6 @@ class ApiController extends ResourceController
 
         $parameters = array();
 
-
         // Forgot Request
         if (!$this->request->has('token')) {
             $validator = Validator::make(request()->all(), [
@@ -120,7 +179,7 @@ class ApiController extends ResourceController
             ]);
 
             if ($validator->fails()) {
-                return response()->json($validator->errors(), 422);
+                return response()->json($validator->errors(), 400);
             }
 
             try {
@@ -136,6 +195,7 @@ class ApiController extends ResourceController
                 $parameters['success-verification'] = $encrypter->encrypt($this->request->get('success-params'));
                 $parameters['error-verification'] = $encrypter->encrypt($this->request->get('error-params'));
                 $parameters['redirect'] = $encrypter->encrypt($this->request->callback);
+                $parameters['email'] = $encrypter->encrypt($user->email);
 
                 $url = url('api/forgot-password') . '?' . http_build_query($parameters);
 
@@ -148,6 +208,18 @@ class ApiController extends ResourceController
             }
         }
 
+        $validator = Validator::make(request()->all(), [
+            'success-verification' => 'required',
+            'error-verification' => 'required',
+            'token' => 'required',
+            'redirect' => 'required',
+            'email' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
         // Redirect Request
         try {
             $callback = $encrypter->decrypt($this->request->redirect);
@@ -155,7 +227,7 @@ class ApiController extends ResourceController
             $success = $encrypter->decrypt($this->request->get('success-verification'));
             $error = $encrypter->decrypt($this->request->get('error-verification'));
 
-            if ($user = $users->findBy('reset_code', $encrypter->decrypt($this->request->token))) {
+            if ($user = $users->findBy('email', $encrypter->decrypt($this->request->email))) {
                 $callback = $this->generateCallback($callback, ['code' => $this->request->token], $success);
             } else {
                 $callback = $this->generateCallback($callback, [], $error);
@@ -208,10 +280,12 @@ class ApiController extends ResourceController
     {
         $url_parsed = parse_url($url);
 
+        $parameters_prefix = "?";
+
         if (isset($url_parsed['query'])) {
-            return $url . "&" . (count($parameters)) ? http_build_query($parameters) . "&" . $string_parameters : "&" . $string_parameters;
+            $parameters_prefix = "&";
         }
 
-        return $url . "?" . (count($parameters) ? http_build_query($parameters) . "&" . $string_parameters : "&" . $string_parameters);
+        return $url . $parameters_prefix . (count($parameters) ? http_build_query($parameters) . "&" . $string_parameters : "&" . $string_parameters);
     }
 }
