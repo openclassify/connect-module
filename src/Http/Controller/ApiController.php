@@ -245,11 +245,17 @@ class ApiController extends ResourceController
     {
         $validator = Validator::make(request()->all(), [
             'code' => 'required',
-            'new-password' => 'required|max:20',
+            'password' => 'required|max:20',
+            're-password' => 'required|max:20',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
+        }
+
+        if (request('password') != request('re-password')) {
+            throw new \Exception(trans('visiosoft.module.connect::message.error-re-password'));
+            die;
         }
 
         $users = app(UserRepositoryInterface::class);
