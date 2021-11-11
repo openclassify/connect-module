@@ -250,7 +250,7 @@ class ApiController extends ResourceController
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return response()->json($validator->errors(), 400);
         }
 
         if (request('password') != request('re-password')) {
