@@ -269,7 +269,7 @@ class ApiController extends ResourceController
                 throw new \Exception(trans('anomaly.module.users::error.reset_password'));
             }
 
-            if (!$password->reset($user, $code, $this->request->get('new-password'))) {
+            if (!$password->reset($user, $code, $this->request->get('password'))) {
                 throw new \Exception(trans('anomaly.module.users::error.reset_password'));
             }
 
