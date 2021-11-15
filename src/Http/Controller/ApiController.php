@@ -9,11 +9,10 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Auth\Guard;
 use Anomaly\UsersModule\User\UserAuthenticator;
 use Illuminate\Encryption\Encrypter;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
+use Visiosoft\ConnectModule\Events\UserRegistered;
 use Visiosoft\ConnectModule\Notification\ActivateYourAccount;
 use Visiosoft\ConnectModule\Notification\ResetYourPassword;
 
@@ -147,6 +146,8 @@ class ApiController extends ResourceController
 
             if ($user = $users->findBy('email', $encrypter->decrypt($this->request->email))
             and $activator->activate($user, $encrypter->decrypt($this->request->token))) {
+
+                event(new UserRegistered($user));
 
                 $callback = $this->generateCallback($callback, ['code' => $this->request->token], $success);
             } else {
