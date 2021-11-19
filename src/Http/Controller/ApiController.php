@@ -86,7 +86,7 @@ class ApiController extends ResourceController
 
             try {
 
-                $user_id = DB::table('users_users')->insertGetId([
+                $create_parameters = [
                     'email' => $this->request->email,
                     'created_at' => Carbon::now(),
                     'str_id' => str_random(24),
@@ -94,7 +94,13 @@ class ApiController extends ResourceController
                     'password' => app('hash')->make($this->request->password),
                     'display_name' => $this->request->name,
                     'first_name' => array_first(explode(' ', $this->request->name)),
-                ]);
+                ];
+
+                if ($this->request->has('referrer')) {
+                    $create_parameters['referrer'] = $this->request->referrer;
+                }
+
+                $user_id = DB::table('users_users')->insertGetId($create_parameters);
 
                 $user = $this->userRepository->find($user_id);
 
@@ -143,9 +149,8 @@ class ApiController extends ResourceController
             $error = $encrypter->decrypt($this->request->get('error-verification'));
 
 
-
             if ($user = $users->findBy('email', $encrypter->decrypt($this->request->email))
-            and $activator->activate($user, $encrypter->decrypt($this->request->token))) {
+                and $activator->activate($user, $encrypter->decrypt($this->request->token))) {
 
                 event(new UserRegistered($user));
 
