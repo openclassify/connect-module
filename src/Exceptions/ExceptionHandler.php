@@ -2,6 +2,7 @@
 
 namespace Visiosoft\ConnectModule\Exceptions;
 
+use Anomaly\Streams\Platform\Exception\ExceptionIdentifier;
 use Exception;
 use Throwable;
 use Illuminate\Http\Request;
