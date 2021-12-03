@@ -9,7 +9,6 @@ use Illuminate\Support\Collection;
 /**
  * Class Result
  *
-
  * @package       Visiosoft\ConnectModule\Resource\Component\Result
  */
 class Result implements ResultInterface
@@ -110,7 +109,11 @@ class Result implements ResultInterface
      */
     public function toArray()
     {
-        $entry = $this->entry->toArrayForApi();
+        if ($this->entry instanceof EloquentModel) {
+            $entry = $this->entry->toArrayForApi();
+        } else {
+            $entry = $this->entry;
+        }
 
         /* @var Formatter $formatter */
         foreach ($this->getFormatters() as $formatter) {
