@@ -71,7 +71,7 @@ class ApiController extends ResourceController
         if (!$this->request->has('token')) {
 
             $validator = Validator::make(request()->all(), [
-                'email' => 'required|email|unique:users_users,email',
+                'email' => 'required|email',
                 'password' => 'required|max:55',
                 'username' => 'required|max:20|unique:users_users,username',
                 'name' => 'required|max:55',
@@ -86,23 +86,38 @@ class ApiController extends ResourceController
 
             try {
 
-                $create_parameters = [
-                    'email' => $this->request->email,
-                    'created_at' => Carbon::now(),
-                    'str_id' => str_random(24),
-                    'username' => $this->request->username,
-                    'password' => app('hash')->make($this->request->password),
-                    'display_name' => $this->request->name,
-                    'first_name' => array_first(explode(' ', $this->request->name)),
-                ];
+                if (!$user = $users->findByEmail($this->request->email)) {
 
-                if ($this->request->has('referrer')) {
-                    $create_parameters['referrer'] = $this->request->referrer;
+                    $create_parameters = [
+                        'email' => $this->request->email,
+                        'created_at' => Carbon::now(),
+                        'str_id' => str_random(24),
+                        'username' => $this->request->username,
+                        'password' => app('hash')->make($this->request->password),
+                        'display_name' => $this->request->name,
+                        'first_name' => array_first(explode(' ', $this->request->name)),
+                    ];
+
+                    if ($this->request->has('referrer')) {
+                        $create_parameters['referrer'] = $this->request->referrer;
+                    }
+
+                    $user_id = DB::table('users_users')->insertGetId($create_parameters);
+
+                    $user = $this->userRepository->find($user_id);
+                } else {
+                    if ($user->enabled)
+                    {
+                        $validator = Validator::make(request()->all(), [
+                            'email' => 'required|email|unique:users_users,email',
+                        ]);
+
+                        if ($validator->fails()) {
+                            return response()->json($validator->errors(), 400);
+                        }
+                    }
                 }
 
-                $user_id = DB::table('users_users')->insertGetId($create_parameters);
-
-                $user = $this->userRepository->find($user_id);
 
                 $user->setAttribute('activation_code', str_random(40));
                 $user->save();
@@ -151,6 +166,9 @@ class ApiController extends ResourceController
 
             if ($user = $users->findBy('email', $encrypter->decrypt($this->request->email))
                 and $activator->activate($user, $encrypter->decrypt($this->request->token))) {
+
+                $user->setAttribute('enabled', true);
+                $user->save();
 
                 event(new UserRegistered($user));
 
