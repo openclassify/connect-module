@@ -2,6 +2,8 @@
 
 use Visiosoft\ConnectModule\Command\LoadKeys;
 use Visiosoft\ConnectModule\Command\LoadScopes;
+use Visiosoft\ConnectModule\Events\ActivateAccount;
+use Visiosoft\ConnectModule\Listeners\SendActivationMail;
 use Visiosoft\ConnectModule\Passport\PassportServiceProvider;
 use Visiosoft\ConnectModule\User\UserModel;
 use Anomaly\Streams\Platform\Addon\AddonServiceProvider;
@@ -266,4 +268,10 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
             ]
         )->middleware('auth:api');
     }
+
+    protected $listeners = [
+        ActivateAccount::class => [
+            SendActivationMail::class,
+        ],
+    ];
 }
