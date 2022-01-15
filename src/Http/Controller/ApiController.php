@@ -12,8 +12,8 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
+use Visiosoft\ConnectModule\Events\ActivateAccount;
 use Visiosoft\ConnectModule\Events\UserRegistered;
-use Visiosoft\ConnectModule\Notification\ActivateYourAccount;
 use Visiosoft\ConnectModule\Notification\ResetYourPassword;
 
 
@@ -130,7 +130,8 @@ class ApiController extends ResourceController
 
                 $url = url('api/register') . '?' . http_build_query($parameters);
 
-                $user->notify(new ActivateYourAccount($url));
+                event(new ActivateAccount($user,$url));
+//                $user->notify(new ActivateYourAccount($url));
 
                 return [
                     'success' => true,
