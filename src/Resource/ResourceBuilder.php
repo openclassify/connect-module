@@ -52,6 +52,13 @@ class ResourceBuilder
     protected $id = null;
 
     /**
+     * The paginate to retrieve.
+     *
+     * @var true|boolean
+     */
+    protected $paginate = true;
+
+    /**
      * The ID to retrieve.
      *
      * @var null|int
@@ -230,6 +237,27 @@ class ResourceBuilder
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get the paginate.
+     *
+     * @return boolean|true
+     */
+    public function getPaginate()
+    {
+        return $this->paginate;
+    }
+
+    /**
+     * @param $boolean
+     * @return $this
+     */
+    public function setPaginate($boolean)
+    {
+        $this->paginate = $boolean;
 
         return $this;
     }
