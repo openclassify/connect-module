@@ -216,8 +216,9 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
          */
         $offset = $limit * (app('request')->get('page', 1) - 1);
 
-        $query->take($limit)->offset($offset);
-
+        if($builder->getPaginate()){
+            $query->take($limit)->offset($offset);
+        }
 
 
 //        dd($builder->getResourceOption('filters'),$builder->getResourceOption('order_by'),$builder->getFilters(),$builder->getOption('filter'));

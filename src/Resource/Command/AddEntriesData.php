@@ -53,7 +53,7 @@ class AddEntriesData
 
             $this->builder->addResourceData('data', $entries);
 
-            if (!$this->builder->getResourceOption('map')) {
+            if (!$this->builder->getResourceOption('map') && $this->builder->getPaginate()) {
                 $this->builder->addResourceData('pagination', $pagination->make($this->builder));
             }
         }
