@@ -234,8 +234,11 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
         /**
          * Order the query results.
          */
-        foreach ($builder->getResourceOption('order_by') as $formatter => $direction) {
-            $query->orderBy($formatter, $direction);
+        if($builder->getResourceOption('order_by'))
+        {
+            foreach ($builder->getResourceOption('order_by') as $formatter => $direction) {
+                $query->orderBy($this->model->getTable() .".". $formatter, $direction);
+            }
         }
 
         return $query->get();

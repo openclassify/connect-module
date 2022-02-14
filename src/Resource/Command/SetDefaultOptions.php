@@ -48,20 +48,20 @@ class SetDefaultOptions
         /**
          * Set the default ordering options.
          */
-        if (!$resource->getOption('order_by')) {
-
-            $model = $resource->getModel();
-
-            if ($model instanceof EntryModel) {
-                if ($model->titleColumnIsTranslatable()) {
-                    $resource->setOption('order_by', ['sort_order' => 'asc']);
-                } else {
-                    $resource->setOption('order_by', [$model->getTitleName() => 'asc']);
-                }
-            } elseif ($model instanceof EloquentModel) {
-                $resource->setOption('order_by', ['id' => 'asc']);
-            }
-        }
+//        if (!$resource->getOption('order_by')) {
+//
+//            $model = $resource->getModel();
+//
+//            if ($model instanceof EntryModel) {
+//                if ($model->titleColumnIsTranslatable()) {
+//                    $resource->setOption('order_by', ['sort_order' => 'asc']);
+//                } else {
+//                    $resource->setOption('order_by', [$model->getTitleName() => 'asc']);
+//                }
+//            } elseif ($model instanceof EloquentModel) {
+//                $resource->setOption('order_by', ['id' => 'asc']);
+//            }
+//        }
 
         /**
          * Limit to 1 result if ID is set.
