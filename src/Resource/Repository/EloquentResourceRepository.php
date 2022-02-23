@@ -1,8 +1,10 @@
 <?php namespace Visiosoft\ConnectModule\Resource\Repository;
 
 use Anomaly\Streams\Platform\Entry\EntryQueryBuilder;
+use Illuminate\Support\Facades\DB;
 use Visiosoft\ConnectModule\Resource\Contract\ResourceRepositoryInterface;
 use Visiosoft\ConnectModule\Resource\Event\ResourceIsQuerying;
+use Visiosoft\ConnectModule\Resource\Raw\RawQueryBuilder;
 use Visiosoft\ConnectModule\Resource\ResourceBuilder;
 use Anomaly\Streams\Platform\Model\EloquentCollection;
 use Anomaly\Streams\Platform\Model\EloquentModel;
@@ -66,8 +68,7 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
 
         $search_parameters = $builder->getResourceOption("parameters", []);
 
-        if ($builder->getId())
-        {
+        if ($builder->getId()) {
             $search_parameters['id'] = $builder->getId();
         }
 
@@ -77,6 +78,8 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
 
         if ($query instanceof EntryQueryBuilder) {
             return $this->returnQuerying($query, $builder);
+        } elseif ($query instanceof RawQueryBuilder) {
+            return $this->returnRaw($query, $builder);
         }
 
         return $query;
@@ -141,6 +144,40 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
             echo json_encode(['status' => false, 'message' => $exception->getMessage()]);
             die;
         }
+    }
+
+    public function returnRaw($raw, $builder)
+    {
+        $total = $raw->count();
+
+        $query = $raw->raw();
+
+
+        $builder->setResourceOption('total_results', $total);
+
+        $limit = $builder->getResourceOption('limit', 100);
+        $page = app('request')->get('page', 1);
+        $offset = $limit * ($page - 1);
+
+        if ($total < $offset && $page > 1) {
+            $url = str_replace('page=' . $page, 'page=' . ($page - 1), app('request')->fullUrl());
+
+            header('Location: ' . $url);
+        }
+
+        /**
+         * Limit the results to the limit and offset
+         * based on the page if any.
+         */
+        $offset = $limit * (app('request')->get('page', 1) - 1);
+
+        if ($builder->getPaginate()) {
+            $query .= " LIMIT " . $limit . " OFFSET " . $offset;
+        }
+
+        $result = DB::select($query);
+
+        return collect(json_decode(json_encode($result), true));
     }
 
     public function returnQuerying($query, $builder)
@@ -216,7 +253,7 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
          */
         $offset = $limit * (app('request')->get('page', 1) - 1);
 
-        if($builder->getPaginate()){
+        if ($builder->getPaginate()) {
             $query->take($limit)->offset($offset);
         }
 
@@ -234,10 +271,9 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
         /**
          * Order the query results.
          */
-        if($builder->getResourceOption('order_by'))
-        {
+        if ($builder->getResourceOption('order_by')) {
             foreach ($builder->getResourceOption('order_by') as $formatter => $direction) {
-                $query->orderBy($this->model->getTable() .".". $formatter, $direction);
+                $query->orderBy($this->model->getTable() . "." . $formatter, $direction);
             }
         }
 
