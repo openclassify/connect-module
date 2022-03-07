@@ -1,6 +1,6 @@
 <?php
 
-namespace Visiosoft\ConnectModule\ConnectModule\User;
+namespace Visiosoft\ConnectModule\User;
 
 use Illuminate\Auth\EloquentUserProvider;
 
