@@ -3,10 +3,12 @@
 class CreateTranslatableValues
 {
     protected $params;
+    protected $unique_value;
 
-    public function __construct(array $params)
+    public function __construct(array $params, $unique_value = "")
     {
         $this->params = $params;
+        $this->unique_value = $unique_value;
     }
 
     public function handle()
@@ -38,7 +40,12 @@ class CreateTranslatableValues
 
             foreach ($this->enabledLocales() as $locale) {
                 if (isset($value[$locale])) {
+
                     $new_parameters[$locale][$key] = $value[$locale];
+
+                    if ($key == "slug") {
+                        $new_parameters[$locale][$key] = $value[$locale] . "-" . $this->unique_value;
+                    }
                 }
             }
 
