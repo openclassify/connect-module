@@ -25,7 +25,7 @@
         }
     },
     "require": {
-        "laravel/passport": "*",
+        "laravel/passport": "v10.3.2",
         "visiosoft/username_authenticator-extension": "*"
     }
 }
