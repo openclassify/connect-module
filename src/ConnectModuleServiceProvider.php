@@ -3,7 +3,9 @@
 use Visiosoft\ConnectModule\Command\LoadKeys;
 use Visiosoft\ConnectModule\Command\LoadScopes;
 use Visiosoft\ConnectModule\Events\ActivateAccount;
+use Visiosoft\ConnectModule\Events\ResetPassword;
 use Visiosoft\ConnectModule\Listeners\SendActivationMail;
+use Visiosoft\ConnectModule\Listeners\SendResetMail;
 use Visiosoft\ConnectModule\Passport\PassportServiceProvider;
 use Visiosoft\ConnectModule\User\UserModel;
 use Anomaly\Streams\Platform\Addon\AddonServiceProvider;
@@ -40,7 +42,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
      */
     protected $routeMiddleware = [
         'scopes' => CheckScopes::class,
-        'scope'  => CheckForAnyScope::class,
+        'scope' => CheckForAnyScope::class,
     ];
 
     /**
@@ -49,9 +51,9 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
      * @var array
      */
     protected $routes = [
-        'oauth/request'       => 'Visiosoft\ConnectModule\Http\Controller\OAuthController@request',
-        'admin/connect'           => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@index',
-        'admin/connect/create'    => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@create',
+        'oauth/request' => 'Visiosoft\ConnectModule\Http\Controller\OAuthController@request',
+        'admin/connect' => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@index',
+        'admin/connect/create' => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@create',
         'admin/connect/edit/{id}' => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@edit',
         'api/login' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@login',
         'api/register' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@register',
@@ -78,7 +80,8 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         ConnectModule $module,
         Factory $views,
         EloquentModel $model
-    ) {
+    )
+    {
         $views->addNamespace('passport', $module->getPath('resources/views'));
 
         $config->set('auth.guards.api.driver', 'passport');
@@ -129,7 +132,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         $router->get(
             'api/entries/{namespace}/{stream}',
             [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\EntriesController@index',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\Resource\EntriesController@index',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
@@ -137,7 +140,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         $router->post(
             'api/entries/{namespace}/{stream}',
             [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\EntriesController@store',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\Resource\EntriesController@store',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
@@ -145,7 +148,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         $router->get(
             'api/entries/{namespace}/{stream}/{id}/{map?}',
             [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\EntriesController@show',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\Resource\EntriesController@show',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->where(['map' => '(.*)']);
@@ -153,7 +156,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         $router->post(
             'api/entries/{namespace}/{stream}/{id}',
             [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\EntriesController@update',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\Resource\EntriesController@update',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
@@ -161,7 +164,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         $router->patch(
             'api/entries/{namespace}/{stream}/{id}',
             [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\EntriesController@update',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\Resource\EntriesController@update',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
@@ -169,20 +172,17 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         $router->post(
             'api/delete-entries/{namespace}/{stream}/{id}',
             [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\EntriesController@delete',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\Resource\EntriesController@delete',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
-
-
-
 
 
         // Function Routes
         $router->get(
             'api/function/{namespace}/{stream}/{function}/{id}',
             [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\FunctionController@show',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\Resource\FunctionController@show',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
@@ -190,7 +190,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         $router->get(
             'api/function/{namespace}/{stream}/{function}',
             [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\FunctionController@index',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\Resource\FunctionController@index',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
@@ -198,7 +198,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         $router->post(
             'api/function/{namespace}/{stream}/{function}',
             [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\FunctionController@store',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\Resource\FunctionController@store',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
@@ -215,7 +215,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         $router->get(
             'api/streams',
             [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\StreamsController@index',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\Resource\StreamsController@index',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
@@ -223,7 +223,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         $router->post(
             'api/streams',
             [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\StreamsController@store',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\Resource\StreamsController@store',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
@@ -231,7 +231,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         $router->get(
             'api/streams/{namespace}',
             [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\StreamsController@streams',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\Resource\StreamsController@streams',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
@@ -239,7 +239,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         $router->get(
             'api/streams/{namespace}/{slug}',
             [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\StreamsController@show',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\Resource\StreamsController@show',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
@@ -247,7 +247,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         $router->put(
             'api/streams/{namespace}/{slug}',
             [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\StreamsController@update',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\Resource\StreamsController@update',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
@@ -255,7 +255,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         $router->patch(
             'api/streams/{namespace}/{slug}',
             [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\StreamsController@update',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\Resource\StreamsController@update',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
@@ -263,7 +263,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         $router->delete(
             'api/streams/{namespace}/{slug}',
             [
-                'uses'           => 'Visiosoft\ConnectModule\Http\Controller\Resource\StreamsController@delete',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\Resource\StreamsController@delete',
                 'streams::addon' => 'visiosoft.module.connect',
             ]
         )->middleware('auth:api');
@@ -272,6 +272,9 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
     protected $listeners = [
         ActivateAccount::class => [
             SendActivationMail::class,
+        ],
+        ResetPassword::class => [
+            SendResetMail::class,
         ],
     ];
 }
