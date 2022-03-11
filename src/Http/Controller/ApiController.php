@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Visiosoft\ConnectModule\Events\ActivateAccount;
+use Visiosoft\ConnectModule\Events\ResetPassword;
 use Visiosoft\ConnectModule\Events\UserRegistered;
 use Visiosoft\ConnectModule\Notification\ResetYourPassword;
 
@@ -106,8 +107,7 @@ class ApiController extends ResourceController
 
                     $user = $this->userRepository->find($user_id);
                 } else {
-                    if ($user->enabled)
-                    {
+                    if ($user->enabled) {
                         $validator = Validator::make(request()->all(), [
                             'email' => 'required|email|unique:users_users,email',
                         ]);
@@ -130,7 +130,7 @@ class ApiController extends ResourceController
 
                 $url = url('api/register') . '?' . http_build_query($parameters);
 
-                event(new ActivateAccount($user,$url));
+                event(new ActivateAccount($user, $url));
 //                $user->notify(new ActivateYourAccount($url));
 
                 return [
@@ -224,7 +224,9 @@ class ApiController extends ResourceController
 
                 $url = url('api/forgot-password') . '?' . http_build_query($parameters);
 
-                $user->notify(new ResetYourPassword($url));
+                event(new ResetPassword($user, $url));
+
+                //$user->notify(new ResetYourPassword($url));
 
                 return ['success' => true];
 
