@@ -46,7 +46,13 @@ class FunctionController extends ResourceController
             $entry = call_user_func([$repository, camel_case($function)], $parameters);
 
         } catch (\Exception $exception) {
-            return $this->response->json(['status' => false, 'message' => $exception->getMessage(),'error_code' => $exception->getCode()],400);
+            $error_code = $exception->getCode();
+
+            $error_list = trans("visiosoft.module.connect::errors");
+
+            $message = (!in_array($error_code, array_keys($error_list))) ? $exception->getMessage() : trans("visiosoft.module.connect::errors." . $error_code);
+
+            return $this->response->json(['status' => false, 'message' => $message, 'error_code' => $error_code], 400);
             die;
         }
 
