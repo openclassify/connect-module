@@ -171,7 +171,7 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
          */
         $offset = $limit * (app('request')->get('page', 1) - 1);
 
-        if ($builder->getPaginate()) {
+        if ($builder->getOption('paginate',true)) {
             $query .= " LIMIT " . $limit . " OFFSET " . $offset;
         }
 
@@ -253,12 +253,10 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
          */
         $offset = $limit * (app('request')->get('page', 1) - 1);
 
-        if ($builder->getPaginate()) {
+        if ($builder->getOption('paginate',true)) {
             $query->take($limit)->offset($offset);
         }
 
-
-//        dd($builder->getResourceOption('filters'),$builder->getResourceOption('order_by'),$builder->getFilters(),$builder->getOption('filter'));
         /**
          * Where clauses
          */
