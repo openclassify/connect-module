@@ -95,7 +95,7 @@ class ExceptionHandler extends Handler
             die();
         }
 
-        if (preg_match("/^\s*api/i", \request()->path())) {
+        if (\request()->is('api/*')) {
             $error_code = $e->getCode();
 
             $error_list = trans("visiosoft.module.connect::errors");
