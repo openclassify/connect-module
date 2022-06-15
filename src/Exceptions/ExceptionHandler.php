@@ -59,10 +59,10 @@ class ExceptionHandler extends Handler
 
         $summary = $e->getMessage();
         $headers = $e->getHeaders();
-        $code    = $e->getStatusCode();
-        $name    = trans("streams::error.{$code}.name");
+        $code = $e->getStatusCode();
+        $name = trans("streams::error.{$code}.name");
         $message = trans("streams::error.{$code}.message");
-        $id      = $this->container->make(ExceptionIdentifier::class)->identify($this->original);
+        $id = $this->container->make(ExceptionIdentifier::class)->identify($this->original);
 
         if (view()->exists($view = "streams::errors/{$code}")) {
             return response()->view($view, compact('id', 'code', 'name', 'message', 'summary'), $code, $headers);
@@ -79,9 +79,38 @@ class ExceptionHandler extends Handler
 
     public function report(Throwable $e)
     {
-        $this->original = $e;
+        if (app()->bound('sentry') &&
+            $this->shouldReport($e) &&
+            env('SENTRY_LARAVEL_DSN') &&
+            !empty(env('SENTRY_LARAVEL_DSN'))) {
+            app('sentry')->captureException($e);
+        }
 
-        return parent::report($e);
+        if ($e instanceof Swift_TransportException) {
+            echo json_encode([
+                'success' => false,
+                'msg' => trans('visiosoft.theme.base::message.error_mail'),
+            ]);
+
+            die();
+        }
+
+        if (\request()->is('api/*')) {
+            $error_code = $e->getCode();
+
+            $error_list = trans("visiosoft.module.connect::errors");
+
+            $message = (!in_array($error_code, array_keys($error_list))) ? $e->getMessage() : trans("visiosoft.module.connect::errors." . $error_code);
+
+            http_response_code(400);
+            header('Content-Type: application/json; charset=UTF-8', true);
+            echo json_encode(['status' => false, 'message' => $message, 'error_code' => $error_code]);
+            die;
+        } else {
+            $this->original = $e;
+
+            return parent::report($e);
+        }
     }
 
 
@@ -90,9 +119,9 @@ class ExceptionHandler extends Handler
         try {
             return array_filter(
                 [
-                    'user'       => Auth::id(),
-                    'email'      => Auth::user() ? Auth::user()->email : null,
-                    'url'        => request() ? request()->fullUrl() : null,
+                    'user' => Auth::id(),
+                    'email' => Auth::user() ? Auth::user()->email : null,
+                    'url' => request() ? request()->fullUrl() : null,
                     'identifier' => $this->container->make(ExceptionIdentifier::class)->identify($this->original),
                 ]
             );
@@ -111,7 +140,7 @@ class ExceptionHandler extends Handler
             return redirect()->guest('admin/login');
         } else {
             if ($request->is('api/*')) {
-                return response()->json(['error' => trans('streams::error.401.name'),'status' => false], 401);
+                return response()->json(['error' => trans('streams::error.401.name'), 'status' => false], 401);
             }
             return redirect()->guest('login');
         }

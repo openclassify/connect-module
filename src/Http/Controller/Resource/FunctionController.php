@@ -40,21 +40,8 @@ class FunctionController extends ResourceController
         $function = $this->route->parameter('function');
 
         $parameters = $this->getOption('parameters', []);
-
-        try {
-
-            $entry = call_user_func([$repository, camel_case($function)], $parameters);
-
-        } catch (\Exception $exception) {
-            $error_code = $exception->getCode();
-
-            $error_list = trans("visiosoft.module.connect::errors");
-
-            $message = (!in_array($error_code, array_keys($error_list))) ? $exception->getMessage() : trans("visiosoft.module.connect::errors." . $error_code);
-
-            return $this->response->json(['status' => false, 'message' => $message, 'error_code' => $error_code], 400);
-            die;
-        }
+        
+        $entry = call_user_func([$repository, camel_case($function)], $parameters);
 
         return $this->response->json(['status' => ($entry) ? true : false, 'response' => (!is_bool($entry) ? $entry : null)]);
     }
