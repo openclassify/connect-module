@@ -62,8 +62,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
     ];
 
     protected $bindings = [
-        'Anomaly\Streams\Platform\Exception\ExceptionHandler' => 'Visiosoft\ConnectModule\Exceptions\ExceptionHandler'
-
+        'App\Exceptions\ExceptionHandler' => 'Visiosoft\ConnectModule\Exceptions\ExceptionHandler'
     ];
 
     /**
