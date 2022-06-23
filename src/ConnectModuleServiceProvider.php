@@ -61,10 +61,6 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         'api/renew-password' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@renew',
     ];
 
-    protected $bindings = [
-        'App\Exceptions\ExceptionHandler' => 'Visiosoft\ConnectModule\Exceptions\ExceptionHandler'
-    ];
-
     /**
      * Register the addon.
      *
@@ -276,4 +272,17 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
             SendResetMail::class,
         ],
     ];
+
+    public function getBindings()
+    {
+        if (class_exists('App\Exceptions\ExceptionHandler')) {
+            return [
+                'App\Exceptions\ExceptionHandler' => 'Visiosoft\ConnectModule\Exceptions\ExceptionHandler'
+            ];
+        }
+
+        return [
+            'Anomaly\Streams\Platform\Exception\ExceptionHandler' => 'Visiosoft\ConnectModule\Exceptions\ExceptionHandler'
+        ];
+    }
 }
