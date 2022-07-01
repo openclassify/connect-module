@@ -1,6 +1,6 @@
 <?php namespace Visiosoft\ConnectModule\Http\Controller\Resource;
 
-use Visiosoft\AdvsModule\Traits\ApiReturnResponseTrait;
+use Visiosoft\ConnectModule\Traits\ApiReturnResponseTrait;
 use Visiosoft\ConnectModule\Command\GetRepository;
 use Visiosoft\ConnectModule\Resource\ResourceBuilder;
 use Anomaly\Streams\Platform\Http\Controller\ResourceController;

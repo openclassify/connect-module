@@ -1,4 +1,4 @@
-<?php namespace Visiosoft\AdvsModule\Traits;
+<?php namespace Visiosoft\ConnectModule\Traits;
 
 trait ApiReturnResponseTrait
 {
