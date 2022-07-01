@@ -4,7 +4,7 @@ trait ApiReturnResponseTrait
 {
     protected $schema = [
         'success' => true,
-        'data' => [],
+        'response' => [],
         'message' => '',
         'error_code' => 0
     ];
@@ -12,7 +12,7 @@ trait ApiReturnResponseTrait
     public function sendResponse($data, $message)
     {
         $schema = $this->schema;
-        $schema['data'] = $data;
+        $schema['response'] = $data;
         $schema['message'] = $message;
         return response($schema, 200);
     }
@@ -21,7 +21,7 @@ trait ApiReturnResponseTrait
     {
         $schema = $this->schema;
         $schema['success'] = false;
-        $schema['data'] = $data;
+        $schema['response'] = $data;
         $schema['message'] = $message;
         $schema['error_code'] = $errorCode;
         return response($schema, $responseCode);
@@ -34,7 +34,7 @@ trait ApiReturnResponseTrait
         $schema['error_code'] = 500;
         if (config('app.debug')) {
             $schema['message'] = $e->getMessage() . ' LINE: ' . $e->getLine();
-            $schema['data'] = $e->getTrace();
+            $schema['response'] = $e->getTrace();
         }
         return response($schema, 500);
     }
