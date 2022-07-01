@@ -54,9 +54,10 @@ class FunctionController extends ResourceController
             $error_list = trans("visiosoft.module.connect::errors");
 
             $data = [];
-            $message = (!in_array($error_code, array_keys($error_list))) ? $exception->getMessage() . ' LINE: ' . $exception->getLine() : trans("visiosoft.module.connect::errors." . $error_code);
+            $message = (!in_array($error_code, array_keys($error_list))) ? $exception->getMessage() : trans("visiosoft.module.connect::errors." . $error_code);
             if (config('debug')) {
                 $data = $exception->getTrace();
+                $message = (!in_array($error_code, array_keys($error_list))) ? $exception->getMessage() . ' LINE: ' . $exception->getLine() : trans("visiosoft.module.connect::errors." . $error_code);
             }
             return $this->sendError($message, "", $data, 200);
         }
