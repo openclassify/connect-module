@@ -9,6 +9,7 @@ use Anomaly\Streams\Platform\Stream\Contract\StreamRepositoryInterface;
 class FunctionController extends ResourceController
 {
     use ApiReturnResponseTrait;
+
     public function index(ResourceBuilder $resources)
     {
         return $resources
@@ -52,11 +53,15 @@ class FunctionController extends ResourceController
 
             $error_list = trans("visiosoft.module.connect::errors");
 
-            $message = (!in_array($error_code, array_keys($error_list))) ? $exception->getMessage() : trans("visiosoft.module.connect::errors." . $error_code);
-            return $this->sendError($message, "", [], 200);
+            $data = [];
+            $message = (!in_array($error_code, array_keys($error_list))) ? $exception->getMessage() . ' LINE: ' . $exception->getLine() : trans("visiosoft.module.connect::errors." . $error_code);
+            if (config('debug')) {
+                $data = $exception->getTrace();
+            }
+            return $this->sendError($message, "", $data, 200);
         }
         if (!$entry) {
-            return $this->sendError('', "", [], 200);
+            return $this->sendError('entry not found!', "", [], 200);
 
         }
         return $this->sendResponse($entry, '');
