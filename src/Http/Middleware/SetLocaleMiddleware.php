@@ -32,6 +32,16 @@ class SetLocaleMiddleware
 
     public function handle(Request $request, Closure $next)
     {
+        if ($locale = $request->user()->locale) {
+
+            $this->application->setLocale($locale);
+
+            Carbon::setLocale($locale);
+
+            setlocale(LC_TIME, $this->locale->full($locale));
+
+            config()->set('_locale', $locale);
+        }
         if (defined('LOCALE')) {
             return $next($request);
         }
@@ -47,16 +57,6 @@ class SetLocaleMiddleware
         }
 
         if ($locale = $request->session()->get('_locale')) {
-
-            $this->application->setLocale($locale);
-
-            Carbon::setLocale($locale);
-
-            setlocale(LC_TIME, $this->locale->full($locale));
-
-            config()->set('_locale', $locale);
-        }
-        if ($locale = $request->user()->locale) {
 
             $this->application->setLocale($locale);
 
