@@ -6,6 +6,7 @@ use Visiosoft\ConnectModule\Events\ActivateAccount;
 use Visiosoft\ConnectModule\Events\ResetPassword;
 use Visiosoft\ConnectModule\Listeners\SendActivationMail;
 use Visiosoft\ConnectModule\Listeners\SendResetMail;
+use Visiosoft\ConnectModule\Middleware\SetLocaleMiddleware;
 use Visiosoft\ConnectModule\Passport\PassportServiceProvider;
 use Visiosoft\ConnectModule\User\UserModel;
 use Anomaly\Streams\Platform\Addon\AddonServiceProvider;
@@ -41,6 +42,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
      * @var array
      */
     protected $routeMiddleware = [
+        'locale' => SetLocaleMiddleware::class,
         'scopes' => CheckScopes::class,
         'scope' => CheckForAnyScope::class,
     ];
@@ -70,10 +72,10 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
      * @param Factory $views
      */
     public function register(
-        Request $request,
-        Repository $config,
+        Request       $request,
+        Repository    $config,
         ConnectModule $module,
-        Factory $views,
+        Factory       $views,
         EloquentModel $model
     )
     {
