@@ -41,6 +41,7 @@ class SetLocaleMiddleware
             setlocale(LC_TIME, $this->locale->full($locale));
 
             config()->set('_locale', $locale);
+            return $next($request);
         }
         if (defined('LOCALE')) {
             return $next($request);
