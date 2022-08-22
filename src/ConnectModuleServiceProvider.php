@@ -1,12 +1,12 @@
 <?php namespace Visiosoft\ConnectModule;
 
+use Visiosoft\ConnectModule\Http\Middleware;
 use Visiosoft\ConnectModule\Command\LoadKeys;
 use Visiosoft\ConnectModule\Command\LoadScopes;
 use Visiosoft\ConnectModule\Events\ActivateAccount;
 use Visiosoft\ConnectModule\Events\ResetPassword;
 use Visiosoft\ConnectModule\Listeners\SendActivationMail;
 use Visiosoft\ConnectModule\Listeners\SendResetMail;
-use Visiosoft\ConnectModule\Middleware\SetLocaleMiddleware;
 use Visiosoft\ConnectModule\Passport\PassportServiceProvider;
 use Visiosoft\ConnectModule\User\UserModel;
 use Anomaly\Streams\Platform\Addon\AddonServiceProvider;
