@@ -1,4 +1,6 @@
-<?php namespace Visiosoft\ConnectModule\Http\Middleware;
+<?php
+
+namespace Visiosoft\ConnectModule\Http\Middleware;
 
 use Anomaly\Streams\Platform\Application\Application as App;
 use Anomaly\Streams\Platform\Support\Locale;
@@ -19,20 +21,29 @@ class SetLocaleMiddleware
     protected $application;
 
     public function __construct(
-        App $app,
-        Locale $locale,
-        Redirector $redirect,
+        App         $app,
+        Locale      $locale,
+        Redirector  $redirect,
         Application $application
-    ) {
-        $this->app         = $app;
-        $this->locale      = $locale;
-        $this->redirect    = $redirect;
+    )
+    {
+        $this->app = $app;
+        $this->locale = $locale;
+        $this->redirect = $redirect;
         $this->application = $application;
     }
 
     public function handle(Request $request, Closure $next)
     {
-        if ($locale = $request->user()->locale) {
+        $locale = null;
+        if (!empty($request->get('_locale'))) {
+            $locale = $request->get('_locale');
+        }
+
+        if (!empty($request->header('locale'))) {
+            $locale = $request->header('locale');
+        }
+        if ($locale) {
 
             $this->application->setLocale($locale);
 
@@ -41,34 +52,8 @@ class SetLocaleMiddleware
             setlocale(LC_TIME, $this->locale->full($locale));
 
             config()->set('_locale', $locale);
-            return $next($request);
-        }
-        if (defined('LOCALE')) {
-            return $next($request);
-        }
 
-        if ($locale = $request->get('_locale')) {
-            if ($locale) {
-                $request->session()->put('_locale', $locale);
-            } else {
-                $request->session()->remove('_locale');
-            }
-
-            return $this->redirect->back();
-        }
-
-        if ($locale = $request->session()->get('_locale')) {
-
-            $this->application->setLocale($locale);
-
-            Carbon::setLocale($locale);
-
-            setlocale(LC_TIME, $this->locale->full($locale));
-
-            config()->set('_locale', $locale);
-        }
-
-        if (!$locale) {
+        } else {
 
             $locale = $this->app->getLocale() ?: config('streams::locales.default');
 
