@@ -51,10 +51,6 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         SetLocaleMiddleware::class
     ];
 
-    protected $middleware = [
-        SetLocaleMiddleware::class
-    ];
-
     /**
      * The addon routes.
      *
