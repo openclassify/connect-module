@@ -44,6 +44,11 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
     protected $routeMiddleware = [
         'scopes' => CheckScopes::class,
         'scope' => CheckForAnyScope::class,
+        'locale' => SetLocaleMiddleware::class
+    ];
+
+    protected $middleware = [
+        SetLocaleMiddleware::class
     ];
 
     protected $middleware = [
@@ -75,10 +80,10 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
      * @param Factory $views
      */
     public function register(
-        Request $request,
-        Repository $config,
+        Request       $request,
+        Repository    $config,
         ConnectModule $module,
-        Factory $views,
+        Factory       $views,
         EloquentModel $model
     )
     {
