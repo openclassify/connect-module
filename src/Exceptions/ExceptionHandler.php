@@ -102,7 +102,7 @@ class ExceptionHandler extends Handler
 
             $message = (!in_array($error_code, array_keys($error_list))) ? $e->getMessage() : trans("visiosoft.module.connect::errors." . $error_code);
 
-            http_response_code(400);
+            http_response_code(401);
             header('Content-Type: application/json; charset=UTF-8', true);
             echo json_encode(['status' => false, 'message' => $message, 'error_code' => $error_code]);
             die;
