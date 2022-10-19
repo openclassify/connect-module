@@ -104,6 +104,7 @@ class ExceptionHandler extends Handler
 
             http_response_code(401);
             header('Content-Type: application/json; charset=UTF-8', true);
+            header('Access-Control-Allow-Origin: *');
             echo json_encode(['status' => false, 'message' => $message, 'error_code' => $error_code]);
             die;
         } else {
