@@ -6,7 +6,6 @@ use Illuminate\Contracts\Routing\ResponseFactory;
 /**
  * Class MakeJsonResponse
  *
-
  * @package       Visiosoft\ConnectModule\Resource\Command
  */
 class MakeJsonResponse

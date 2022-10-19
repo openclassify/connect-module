@@ -118,7 +118,9 @@ class ExceptionHandler extends Handler
             $schema['error_code'] = $error_code;
 
             header('Content-Type: application/json; charset=UTF-8', true);
-            return response($schema, 400);
+            header('Access-Control-Allow-Origin: *');
+
+            return response($schema, $error_code);
         } else {
             $this->original = $e;
 
