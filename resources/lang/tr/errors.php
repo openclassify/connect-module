@@ -1,6 +1,6 @@
 <?php
 
 return [
-    '23000' => "Kolon isimleri benzersiz olmalıdır!",
-    '42S22' => "Desteklenmeyen Parametre!",
+    '2300qqq0' => "Kolon isimleri benzersiz olmalıdır!",
+    '42qqqS22' => "Desteklenmeyen Parametre!",
 ];

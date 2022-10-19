@@ -1,5 +1,6 @@
 <?php namespace Visiosoft\ConnectModule\Http\Controller\Resource;
 
+use Visiosoft\ConnectModule\Traits\ApiReturnResponseTrait;
 use Visiosoft\ConnectModule\Command\GetRepository;
 use Visiosoft\ConnectModule\Resource\ResourceBuilder;
 use Anomaly\Streams\Platform\Http\Controller\ResourceController;
@@ -7,6 +8,8 @@ use Anomaly\Streams\Platform\Stream\Contract\StreamRepositoryInterface;
 
 class FunctionController extends ResourceController
 {
+    use ApiReturnResponseTrait;
+
     public function index(ResourceBuilder $resources)
     {
         return $resources
@@ -40,10 +43,29 @@ class FunctionController extends ResourceController
         $function = $this->route->parameter('function');
 
         $parameters = $this->getOption('parameters', []);
-        
-        $entry = call_user_func([$repository, camel_case($function)], $parameters);
 
-        return $this->response->json(['status' => ($entry) ? true : false, 'response' => (!is_bool($entry) ? $entry : null)]);
+        try {
+
+            $entry = call_user_func([$repository, camel_case($function)], $parameters);
+
+        } catch (\Exception $exception) {
+            $error_code = $exception->getCode();
+
+            $error_list = trans("visiosoft.module.connect::errors");
+
+            $data = [];
+            $message = (!in_array($error_code, array_keys($error_list))) ? $exception->getMessage() : trans("visiosoft.module.connect::errors." . $error_code);
+            if (config('debug')) {
+                $data = $exception->getTrace();
+                $message = (!in_array($error_code, array_keys($error_list))) ? $exception->getMessage() . ' LINE: ' . $exception->getLine() : trans("visiosoft.module.connect::errors." . $error_code);
+            }
+            return $this->sendError($message, "", $data, 200);
+        }
+        if (!$entry) {
+            return $this->sendError('entry not found!', "", [], 200);
+
+        }
+        return $this->sendResponse($entry, '');
     }
 
 
