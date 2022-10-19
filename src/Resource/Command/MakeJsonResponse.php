@@ -36,6 +36,18 @@ class MakeJsonResponse
      */
     public function handle(ResponseFactory $response)
     {
+        if (request()->getMethod() == "POST") {
+            $schema = [
+                'success' => true,
+                'response' => [],
+                'message' => '',
+                'error_code' => 0
+            ];
+
+            $schema['response'] = $this->builder->getResourceData();
+            return $response->json($schema);
+        }
+
         return $response->json($this->builder->getResourceData());
     }
 }
