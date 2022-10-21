@@ -28,14 +28,22 @@ class FunctionController extends ResourceController
             );
     }
 
-    public function store(ResourceBuilder $resources)
+    public function store(StreamRepositoryInterface $streams)
     {
-        return $resources
-            ->setFunction($this->route->parameter('function'))
-            ->response(
-                $this->route->parameter('namespace'),
-                $this->route->parameter('stream')
-            );
+        $stream = $streams->findBySlugAndNamespace(
+            $this->route->parameter('stream'),
+            $this->route->parameter('namespace')
+        );
+
+        $repository = $this->dispatch(new GetRepository($stream->getEntryModelName()));
+
+        $function = $this->route->parameter('function');
+
+        $parameters = $this->getOption('parameters', []);
+        
+        $entry = call_user_func([$repository, camel_case($function)], $parameters);
+
+        return $this->response->json(['status' => ($entry) ? true : false, 'response' => (!is_bool($entry) ? $entry : null)]);
     }
 
 

@@ -18,12 +18,6 @@ class ExceptionHandler extends Handler
 {
     protected $original;
 
-    protected $schema = [
-        'success' => true,
-        'data' => [],
-        'message' => '',
-        'error_code' => 0
-    ];
 
     protected $internalDontReport = [
         \Illuminate\Auth\AuthenticationException::class,
@@ -108,19 +102,10 @@ class ExceptionHandler extends Handler
 
             $message = (!in_array($error_code, array_keys($error_list))) ? $e->getMessage() : trans("visiosoft.module.connect::errors." . $error_code);
 
-            if ($e instanceof AuthenticationException) {
-                return $this->unauthenticated(\request(), $e);
-            }
-
-            $schema = $this->schema;
-            $schema['success'] = false;
-            $schema['message'] = $message;
-            $schema['error_code'] = $error_code;
-
+            http_response_code(400);
             header('Content-Type: application/json; charset=UTF-8', true);
-            header('Access-Control-Allow-Origin: *');
-
-            return response($schema, $error_code);
+            echo json_encode(['status' => false, 'message' => $message, 'error_code' => $error_code]);
+            die;
         } else {
             $this->original = $e;
 
@@ -147,20 +132,15 @@ class ExceptionHandler extends Handler
 
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        $schema = $this->schema;
-        $schema['success'] = false;
-        $schema['message'] = trans('streams::error.401.name');
-        $schema['error_code'] = 401;
-
         if ($request->expectsJson()) {
-            return response($schema, 401);
+            return response()->json(['error' => 'Unauthenticated.'], 401);
         }
 
         if ($request->segment(1) === 'admin') {
             return redirect()->guest('admin/login');
         } else {
             if ($request->is('api/*')) {
-                return response($schema, 401);
+                return response()->json(['error' => trans('streams::error.401.name'), 'status' => false], 401);
             }
             return redirect()->guest('login');
         }
