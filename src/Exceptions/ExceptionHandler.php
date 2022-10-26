@@ -96,6 +96,11 @@ class ExceptionHandler extends Handler
         }
 
         if (\request()->is('api/*')) {
+            
+             if ($e instanceof AuthenticationException) {
+                return $this->unauthenticated(\request(), $e);
+            }
+            
             $error_code = $e->getCode();
 
             $error_list = trans("visiosoft.module.connect::errors");
