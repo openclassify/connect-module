@@ -87,29 +87,30 @@ class ExceptionHandler extends Handler
         }
 
         if ($e instanceof Swift_TransportException) {
+            http_response_code(500);
+            header('Content-Type: application/json; charset=UTF-8', true);
             echo json_encode([
                 'success' => false,
-                'msg' => trans('visiosoft.theme.base::message.error_mail'),
+                'message' => [trans('visiosoft.theme.base::message.error_mail')],
             ]);
-
-            die();
+            die;
         }
 
         if (\request()->is('api/*')) {
-            
-             if ($e instanceof AuthenticationException) {
+
+            if ($e instanceof AuthenticationException) {
                 return $this->unauthenticated(\request(), $e);
             }
-            
+
             $error_code = $e->getCode();
 
             $error_list = trans("visiosoft.module.connect::errors");
 
-            $message = (!in_array($error_code, array_keys($error_list))) ? $e->getMessage() : trans("visiosoft.module.connect::errors." . $error_code);
 
+            $message = (!array_value($error_list, $error_code)) ? $e->getMessage() : trans("visiosoft.module.connect::errors." . $error_code);
             http_response_code(400);
             header('Content-Type: application/json; charset=UTF-8', true);
-            echo json_encode(['status' => false, 'message' => $message, 'error_code' => $error_code]);
+            echo json_encode(['success' => false, 'message' => [$message], 'error_code' => $error_code]);
             die;
         } else {
             $this->original = $e;
@@ -138,14 +139,14 @@ class ExceptionHandler extends Handler
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         if ($request->expectsJson()) {
-            return response()->json(['error' => 'Unauthenticated.'], 401);
+            return response()->json(['success' => false, 'message' => ['Unauthenticated.']], 401);
         }
 
         if ($request->segment(1) === 'admin') {
             return redirect()->guest('admin/login');
         } else {
             if ($request->is('api/*')) {
-                return response()->json(['error' => trans('streams::error.401.name'), 'status' => false], 401);
+                return response()->json(['message' => [trans('streams::error.401.name')], 'success' => false], 401);
             }
             return redirect()->guest('login');
         }
