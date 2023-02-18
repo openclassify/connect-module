@@ -1,5 +1,6 @@
 <?php namespace Visiosoft\ConnectModule;
 
+use Carbon\Carbon;
 use Visiosoft\ConnectModule\Command\LoadKeys;
 use Visiosoft\ConnectModule\Command\LoadScopes;
 use Visiosoft\ConnectModule\Events\ActivateAccount;
@@ -60,8 +61,6 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         'admin/connect' => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@index',
         'admin/connect/create' => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@create',
         'admin/connect/edit/{id}' => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@edit',
-        'api/login' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@login',
-        'api/register' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@register',
         'api/forgot-password' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@forgotPassword',
         'api/renew-password' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@renew',
     ];
@@ -75,10 +74,10 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
      * @param Factory $views
      */
     public function register(
-        Request $request,
-        Repository $config,
+        Request       $request,
+        Repository    $config,
         ConnectModule $module,
-        Factory $views,
+        Factory       $views,
         EloquentModel $model
     )
     {
@@ -98,6 +97,11 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
                 return $this->toArray();
             }
         );
+
+        // Set Expire Time
+        Passport::routes();
+        Passport::tokensExpireIn(Carbon::now()->addDay(7));
+        Passport::refreshTokensExpireIn(Carbon::now()->addDay(14));
     }
 
     /**
@@ -116,6 +120,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
      */
     public function map(Router $router)
     {
+        $this->mapRouters($router);
         $this->mapStreamsApi($router);
         $this->mapEntriesApi($router);
 
@@ -203,6 +208,23 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
             ]
         )->middleware('auth:api');
 
+    }
+
+    public function mapRouters(Router $router)
+    {
+        $router->post(
+            'api/login',
+            [
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@login',
+            ]
+        );
+
+        $router->post(
+            'api/register',
+            [
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@register',
+            ]
+        );
     }
 
     /**

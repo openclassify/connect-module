@@ -12,6 +12,7 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
+use Visiosoft\ConnectModule\Command\CheckRequiredParams;
 use Visiosoft\ConnectModule\Events\ActivateAccount;
 use Visiosoft\ConnectModule\Events\ResetPassword;
 use Visiosoft\ConnectModule\Events\UserRegistered;
@@ -25,9 +26,9 @@ class ApiController extends ResourceController
     private $userRepository;
 
     public function __construct(
-        UserAuthenticator $authenticator,
+        UserAuthenticator       $authenticator,
         UserRepositoryInterface $userRepository,
-        Guard $guard
+        Guard                   $guard
     )
     {
         $this->authenticator = $authenticator;
@@ -38,29 +39,83 @@ class ApiController extends ResourceController
 
     public function login()
     {
-        $request_parameters = $this->request->toArray();
+        $parameters = $this->request->all();
 
-        if (isset($request_parameters['email']) && !filter_var(request('email'), FILTER_VALIDATE_EMAIL)) {
-            $request_parameters['username'] = $request_parameters['email'];
-            unset($request_parameters['email']);
-        }
+        // Validate Passport parameters
+        $validator = Validator::make($parameters, [
+            'client_secret' => 'required|max:100',
+            'client_id' => 'required|max:100',
+            'grant_type' => 'required|max:100',
+        ]);
 
-        if ($response = $this->authenticator->authenticate($request_parameters)) {
-            if ($response instanceof UserInterface) {
+        // Check grant_type and add error
+        if (!empty($this->request->grant_type) && $this->request->grant_type == 'refresh_token') {
+            if (empty($this->request->refresh_token)) {
+                $validator->errors()->add('refresh_token', trans('visiosoft.module.connect::errors.refresh_token'));
+            }
+        } elseif (!empty($this->request->grant_type) && $this->request->grant_type == 'password') {
+            // Check username or email parameters
+            if (empty($this->request->email) && empty($this->request->username)) {
+                $validator->errors()->add('username', trans('visiosoft.module.connect::errors.username_or_email_required'));
+                $validator->errors()->add('email', trans('visiosoft.module.connect::errors.username_or_email_required'));
+            }
 
-                if (!$response->isActivated() or !$response->isEnabled()) {
-                    return $this->response->json(['success' => false, 'message' => trans('visiosoft.module.connect::message.disabled_account')], 400);
-                }
-
-                $u_id = $response->id;
-                $response = ['id' => $response->getId()];
-                $response['token'] = app(\Visiosoft\ConnectModule\User\UserModel::class)->find($u_id)->createToken($u_id)->accessToken;
-
-                return $this->response->json($response);
+            if (empty($this->request->password)) {
+                $validator->errors()->add('password', trans('visiosoft.module.connect::errors.password'));
             }
         }
 
-        return $this->response->json(['success' => false, 'message' => trans('visiosoft.module.connect::message.error_auth')], 400);
+        if ($validator->errors()->count()) {
+            return $this->response->json([
+                'success' => false,
+                'message' => $validator->errors(),
+            ], 400);
+        }
+
+        // Set username parameter
+
+        $request_parameters = [];
+        if ($this->request->grant_type == 'password' && $this->request->has('email')) {
+            $parameters['username'] = $this->request->email;
+
+            $request_parameters = [
+                'username' => $parameters['username'],
+                'password' => $parameters['password'],
+            ];
+        } else if ($this->request->grant_type == 'refresh_token') {
+            $request_parameters = [
+                'refresh_token' => $parameters['refresh_token'],
+            ];
+        }
+
+        /**
+         * We are making internal request to laravel passport system
+         * to support login with email or username.
+         */
+        try {
+            $http = new \GuzzleHttp\Client();
+            $response = $http->post(
+                url('oauth/token'),
+                [
+                    'form_params' => array_merge([
+                        'grant_type' => $parameters['grant_type'],
+                        'client_id' => $parameters['client_id'],
+                        'client_secret' => $parameters['client_secret'],
+                    ], $request_parameters),
+                ]
+            );
+
+            return $this->response->json(array_merge(
+                ['success' => true],
+                json_decode((string)$response->getBody(), true)
+            ));
+        } catch (\Exception $exception) {
+            return $this->response->json([
+                'success' => false,
+                'message' => [trans('streams::error.400.name')]
+            ],400);
+        }
+
     }
 
     public function register()
@@ -82,7 +137,10 @@ class ApiController extends ResourceController
             ]);
 
             if ($validator->fails()) {
-                return response()->json($validator->errors(), 400);
+                return $this->response->json([
+                    'success' => false,
+                    'message' => $validator->errors(),
+                ], 400);
             }
 
             try {
@@ -113,7 +171,10 @@ class ApiController extends ResourceController
                         ]);
 
                         if ($validator->fails()) {
-                            return response()->json($validator->errors(), 400);
+                            return $this->response->json([
+                                'success' => false,
+                                'message' => $validator->errors(),
+                            ], 400);
                         }
                     }
                 }
@@ -133,13 +194,13 @@ class ApiController extends ResourceController
                 event(new ActivateAccount($user, $url));
 //                $user->notify(new ActivateYourAccount($url));
 
-                return [
+                return $this->response->json([
                     'success' => true,
-                    'message' => trans('visiosoft.module.connect::message.pending_email_activation')
-                ];
+                    'message' => [trans('visiosoft.module.connect::message.pending_email_activation')]
+                ], 200);
 
             } catch (\Exception $e) {
-                return $this->response->json(['success' => false, 'message' => $e->getMessage()], 400);
+                return $this->response->json(['success' => false, 'message' => [$e->getMessage()]], 400);
             }
         }
 
@@ -152,7 +213,10 @@ class ApiController extends ResourceController
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return response()->json([
+                'success' => true,
+                'message' => $validator->errors()
+            ], 400);
         }
 
         // Redirect Request
@@ -175,15 +239,14 @@ class ApiController extends ResourceController
 
                 $callback = $this->generateCallback($callback, ['code' => $this->request->token], $success);
             } else {
-
                 $callback = $this->generateCallback($callback, [], $error);
             }
 
-            return Redirect::to($callback);
+            return Redirect::to($callback,301);
 
         } catch (\Exception $e) {
 
-            return $this->response->json(['success' => false, 'message' => $e->getMessage()], 400);
+            return $this->response->json(['success' => false, 'message' => [$e->getMessage()]], 400);
         }
     }
 
