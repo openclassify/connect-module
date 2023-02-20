@@ -104,18 +104,21 @@ class ApiController extends ResourceController
                     ], $request_parameters),
                 ]
             );
-
             return $this->response->json(array_merge(
                 ['success' => true],
                 json_decode((string)$response->getBody(), true)
             ));
         } catch (\Exception $exception) {
+            $response = $exception->getResponse();
+            $responseBodyAsString = $response->getBody()->getContents();
+
             return $this->response->json([
                 'success' => false,
-                'message' => [trans('streams::error.400.name')]
-            ],400);
+                'message' => [
+                    json_decode($responseBodyAsString, true)['error_description']
+                ]
+            ], $response->getStatusCode());
         }
-
     }
 
     public function register()
@@ -242,7 +245,7 @@ class ApiController extends ResourceController
                 $callback = $this->generateCallback($callback, [], $error);
             }
 
-            return Redirect::to($callback,301);
+            return Redirect::to($callback, 301);
 
         } catch (\Exception $e) {
 
