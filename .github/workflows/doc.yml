@@ -7,7 +7,7 @@ on:
 env:
   TARGET_REPO: MostafaMoradii/openclassify-docs
   REPO_DIR: openclassify-docs
-  TARGET_BRANCH: docs-${{ steps.current-time.outputs.time }}
+  TARGET_BRANCH: docs-$(date +'%Y-%m-%d %H:%M:%S')
 
 jobs:
   deploy_to_github:
