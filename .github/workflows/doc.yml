@@ -16,9 +16,12 @@ jobs:
         uses: nkoppel/push-files-to-another-repository@v1.1.1
         env:
           API_TOKEN_GITHUB: ${{ secrets.PAT }}
+          PAT: ${{ secrets.PAT }}
+          USERNAME: ${{ secrets.USERNAME }}
+          EMAIL: 'mostafa21tr@gmail.com'
         with:
           source-files: 'docs/en/'
-          destination-username: 'MostafaMoradii'
+          destination-username: $USERNAME
           destination-repository: $TARGET_REPO
           destination-directory: 'addons/modules/connect'
-          commit-email: 'mostafa@visiosoft.com.tr'
+          commit-email: $EMAIL
