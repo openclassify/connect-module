@@ -16,11 +16,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      
-      - name: Copy modified file
-        run: |
-          cp ${{ github.workspace }}/addons/modules/connect .
-        
+
       - name: Set up Git
         uses: webfactory/ssh-agent@v0.5.0
         with:
@@ -35,6 +31,7 @@ jobs:
           git remote add target_repo "https://${GH_USERNAME}:${GH_TOKEN}@github.com/${TARGET_REPO}.git"
           git fetch target_repo
           git checkout -b target_branch
+          cp ${{ github.workspace }}/docs/en/ ${TARGET_REPO}/addons/modules/connect
           git add .
           git commit -m "Update file"
           git push target_repo target_branch
