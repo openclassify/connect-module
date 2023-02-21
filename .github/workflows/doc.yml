@@ -15,11 +15,12 @@ jobs:
       - name: Push generated webpage to another repository
         uses: nkoppel/push-files-to-another-repository@v1.1.1
         env:
-          API_TOKEN_GITHUB: ${{ secrets.PAT }}
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
           PAT: ${{ secrets.PAT }}
           USERNAME: ${{ secrets.USERNAME }}
           EMAIL: 'mostafa21tr@gmail.com'
         with:
+          destination-branch: 'docs'
           source-files: 'docs/en/'
           destination-username: $USERNAME
           destination-repository: $TARGET_REPO
