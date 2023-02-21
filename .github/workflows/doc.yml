@@ -7,7 +7,7 @@ on:
 env:
   TARGET_REPO: MostafaMoradii/openclassify-docs
   REPO_DIR: openclassify-docs
-  TARGET_BRANCH: connect-module-docs-${{ steps.date.outputs.date }}
+  TARGET_BRANCH: connect-module-docs-${{ github.event.repository.updated_at }}
   GH_USERNAME: ${{ secrets.USERNAME }}
   GH_TOKEN: ${{ secrets.PAT }}
 
