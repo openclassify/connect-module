@@ -27,8 +27,8 @@ jobs:
           git checkout -b ${TARGET_BRANCH}
           cp ../docs/en/ addons/modules/connect
           git add .
-          git commit -m "Update file"
-          git push ${TARGET_REPO} ${TARGET_BRANCH}
+          git commit -m "Update docs file"
+          git push origin ${TARGET_BRANCH}
 
       - name: Open pull request
         uses: peter-evans/create-pull-request@v3
