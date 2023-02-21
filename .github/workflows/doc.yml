@@ -17,21 +17,8 @@ jobs:
     steps:
       - name: Push to target repository
         run: |
-          git config --global user.email $GH_USERNAME
-          git config --global user.name $GH_USERNAME
-          git clone "https://$GH_USERNAME:$GH_TOKEN@github.com/$TARGET_REPO.git"
-          cd $REPO_DIR
-          git checkout -b $TARGET_BRANCH
-          cp ../docs/en/ addons/modules/connect
-          git add .
-          git commit -m "Update docs file"
-          git push origin $TARGET_BRANCH
-
-      - name: Open pull request
-        uses: peter-evans/create-pull-request@v3
-        with:
-          token: ${{ secrets.PAT }}
-          commit-message: Update file
-          title: Update file
-          body: This pull request updates the file.
-          branch: $TARGET_BRANCH
+          echo $TARGET_REPO
+          echo $REPO_DIR
+          echo $TARGET_BRANCH
+          echo $GH_USERNAME
+          echo $GH_TOKEN
