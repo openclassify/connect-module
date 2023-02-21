@@ -9,8 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: DATE
-        run: |
-          run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
 
         env:
           TARGET_REPO: MostafaMoradii/openclassify-docs
