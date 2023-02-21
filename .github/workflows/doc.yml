@@ -8,8 +8,6 @@ env:
   TARGET_REPO: MostafaMoradii/openclassify-docs
   REPO_DIR: openclassify-docs
   TARGET_BRANCH: connect-module-docs-${{ github.event.repository.updated_at }}
-  GH_USERNAME: ${{ secrets.USERNAME }}
-  GH_TOKEN: ${{ secrets.PAT }}
 
 jobs:
   deploy_to_github:
@@ -17,8 +15,8 @@ jobs:
     steps:
       - name:
         run: |
-          git config --global user.email $GH_USERNAME
-          git config --global user.name $GH_USERNAME
+          git config --global user.email ${{ secrets.USERNAME }}
+          git config --global user.name ${{ secrets.USERNAME }}
           git clone "https://$GH_USERNAME:$GH_TOKEN@github.com/$TARGET_REPO.git"
           cd $REPO_DIR
           git checkout -b $TARGET_BRANCH
