@@ -6,6 +6,7 @@ on:
 
 env:
   TARGET_REPO: MostafaMoradii/openclassify-docs
+  REPO_DIR: openclassify-docs
   TARGET_BRANCH: connect-module-docs-$(date)
   GH_USERNAME: ${{ secrets.USERNAME }}
   GH_TOKEN: ${{ secrets.PAT }}
@@ -21,10 +22,10 @@ jobs:
         run: |
           git config --global user.email ${GH_USERNAME}
           git config --global user.name ${GH_USERNAME}
-          git remote add target_repo "https://${GH_USERNAME}:${GH_TOKEN}@github.com/${TARGET_REPO}.git"
-          git fetch ${TARGET_REPO}
+          git clone "https://${GH_USERNAME}:${GH_TOKEN}@github.com/${TARGET_REPO}.git"
+          cd ${REPO_DIR}
           git checkout -b ${TARGET_BRANCH}
-          cp ${{ github.workspace }}/docs/en/ ${TARGET_REPO}/addons/modules/connect
+          cp ../docs/en/ addons/modules/connect
           git add .
           git commit -m "Update file"
           git push ${TARGET_REPO} ${TARGET_BRANCH}
