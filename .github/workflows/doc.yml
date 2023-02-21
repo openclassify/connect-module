@@ -15,9 +15,6 @@ jobs:
   deploy_to_github:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
       - name: Push to target repository
         run: |
           git config --global user.email $GH_USERNAME
