@@ -7,7 +7,7 @@ on:
 env:
   TARGET_REPO: MostafaMoradii/openclassify-docs
   REPO_DIR: openclassify-docs
-  TARGET_BRANCH: connect-module-docs-${{ github.event.repository.updated_at }}
+  TARGET_BRANCH: docs-${{ steps.current-time.outputs.time }}
 
 jobs:
   deploy_to_github:
