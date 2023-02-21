@@ -45,6 +45,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
     protected $routeMiddleware = [
         'scopes' => CheckScopes::class,
         'scope' => CheckForAnyScope::class,
+        'locale' => SetLocaleMiddleware::class
     ];
 
     protected $middleware = [

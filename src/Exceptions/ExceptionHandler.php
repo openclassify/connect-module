@@ -106,11 +106,10 @@ class ExceptionHandler extends Handler
 
             $error_list = trans("visiosoft.module.connect::errors");
 
-
-            $message = (!array_value($error_list, $error_code)) ? $e->getMessage() : trans("visiosoft.module.connect::errors." . $error_code);
-            http_response_code(400);
+            http_response_code(401);
             header('Content-Type: application/json; charset=UTF-8', true);
-            echo json_encode(['success' => false, 'message' => [$message], 'error_code' => $error_code]);
+            header('Access-Control-Allow-Origin: *');
+            echo json_encode(['status' => false, 'message' => $message, 'error_code' => $error_code]);
             die;
         } else {
             $this->original = $e;
