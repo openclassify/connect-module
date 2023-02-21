@@ -23,6 +23,6 @@ jobs:
           destination-branch: 'docs'
           source-files: 'docs/en/'
           destination-username: $USERNAME
-          destination-repository: $TARGET_REPO
+          destination-repository: 'MostafaMoradii/openclassify-docs'
           destination-directory: 'addons/modules/connect'
           commit-email: $EMAIL
