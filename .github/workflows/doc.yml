@@ -9,20 +9,21 @@ env:
   REPO_DIR: openclassify-docs
 
 jobs:
-  deploy_to_github:
+  build:
     runs-on: ubuntu-latest
+    container: pandoc/latex
     steps:
-      - name: Push generated webpage to another repository
-        uses: nkoppel/push-files-to-another-repository@v1.1.0
+      - uses: actions/checkout@v2
+      - name: creates output
+        run:  sh ./build.sh
+      - name: Pushes to another repository
+        uses: cpina/github-action-push-to-another-repository@main
         env:
+          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-          PAT: ${{ secrets.PAT }}
-          USERNAME: ${{ secrets.USERNAME }}
-          EMAIL: 'mostafa21tr@gmail.com'
         with:
-          destination-branch: 'docs'
-          source-files: 'docs/en/'
-          destination-username: $USERNAME
-          destination-repository: 'openclassify-docs'
-          destination-directory: 'addons/modules/connect'
-          commit-email: $EMAIL
+          source-directory: 'output'
+          destination-github-username: 'MostafaMoradii'
+          destination-repository-name: 'openclassify-docs'
+          user-email: carles3@pina.cat
+          target-branch: main
