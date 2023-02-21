@@ -12,8 +12,13 @@ jobs:
   deploy_to_github:
     runs-on: ubuntu-latest
     steps:
-      - uses: jitterbit/get-changed-files@v1
-      - name: Push to docs repository
-        run: |
-          git clone "https://${{ secrets.USERNAME }}:${{ secrets.PAT }}@github.com/$TARGET_REPO.git"
-          echo "${{ steps.abc.outputs.all }}"
+      - name: Push generated webpage to another repository
+        uses: nkoppel/push-files-to-another-repository@1.1.0
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.PAT }}
+        with:
+          source-files: 'docs/en/'
+          destination-username: 'MostafaMoradii'
+          destination-repository: $TARGET_REPO
+          destination-directory: 'addons/modules/connect'
+          commit-email: 'mostafa@visiosoft.com.tr'
