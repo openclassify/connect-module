@@ -7,7 +7,7 @@ on:
 env:
   TARGET_REPO: MostafaMoradii/openclassify-docs
   REPO_DIR: openclassify-docs
-  TARGET_BRANCH: docs-${{ github.event.head_commit.time }}
+  TARGET_BRANCH: docs-${{ github.event.head_commit.datetime }}
 
 jobs:
   deploy_to_github:
