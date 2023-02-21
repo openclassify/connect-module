@@ -2,7 +2,7 @@ name: Push to Another GitHub Repository
 on:
   push:
     paths:
-      - docs/en/*
+      - docs/
 
 env:
   TARGET_REPO: MostafaMoradii/openclassify-docs
