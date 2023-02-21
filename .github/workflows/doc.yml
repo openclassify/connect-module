@@ -15,10 +15,14 @@ jobs:
   deploy_to_github:
     runs-on: ubuntu-latest
     steps:
-      - name: CHECK VARIABLE
+      - name:
         run: |
-          echo $TARGET_REPO
-          echo $REPO_DIR
-          echo $TARGET_BRANCH
-          echo $GH_USERNAME
-          echo $GH_TOKEN
+          git config --global user.email $GH_USERNAME
+          git config --global user.name $GH_USERNAME
+          git clone "https://$GH_USERNAME:$GH_TOKEN@github.com/$TARGET_REPO.git"
+          cd $REPO_DIR
+          git checkout -b $TARGET_BRANCH
+          cp ../docs/en/ addons/modules/connect
+          git add .
+          git commit -m "Update docs file"
+          git push origin $TARGET_BRANCH
