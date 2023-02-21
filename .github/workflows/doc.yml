@@ -12,6 +12,7 @@ jobs:
   deploy_to_github:
     runs-on: ubuntu-latest
     steps:
+      - uses: jitterbit/get-changed-files@v1
       - name: Push to docs repository
         run: |
           git clone "https://${{ secrets.USERNAME }}:${{ secrets.PAT }}@github.com/$TARGET_REPO.git"
