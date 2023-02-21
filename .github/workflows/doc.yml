@@ -16,6 +16,7 @@ jobs:
         run: |
           echo "DATETIME=$(date +%s)" >> $GITHUB_ENV
           git clone "https://${{ secrets.USERNAME }}:${{ secrets.PAT }}@github.com/$TARGET_REPO.git"
+          ls
           cd $REPO_DIR
           pwd
           git checkout -b docs
