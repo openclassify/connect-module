@@ -15,6 +15,4 @@ jobs:
       - name: Push to docs repository
         run: |
           git clone "https://${{ secrets.USERNAME }}:${{ secrets.PAT }}@github.com/$TARGET_REPO.git"
-          cd
-          pwd
-          ls
+          echo "${{ steps.abc.outputs.all }}"
