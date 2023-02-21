@@ -4,20 +4,17 @@ on:
     paths:
       - 'docs/en/**'
 
+env:
+  TARGET_REPO: MostafaMoradii/openclassify-docs
+  REPO_DIR: openclassify-docs
+  TARGET_BRANCH: connect-module-docs-${{ steps.date.outputs.date }}
+  GH_USERNAME: ${{ secrets.USERNAME }}
+  GH_TOKEN: ${{ secrets.PAT }}
+
 jobs:
   deploy_to_github:
     runs-on: ubuntu-latest
     steps:
-      - name: DATE
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
-
-        env:
-          TARGET_REPO: MostafaMoradii/openclassify-docs
-          REPO_DIR: openclassify-docs
-          TARGET_BRANCH: connect-module-docs-${{ steps.date.outputs.date }}
-          GH_USERNAME: ${{ secrets.USERNAME }}
-          GH_TOKEN: ${{ secrets.PAT }}
-
       - name: CHECK VARIABLE
         run: |
           echo $TARGET_REPO
