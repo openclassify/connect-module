@@ -15,11 +15,6 @@ jobs:
       - name: Push to docs repository
         run: |
           git clone "https://${{ secrets.USERNAME }}:${{ secrets.PAT }}@github.com/$TARGET_REPO.git"
-          cd $REPO_DIR
-          ls
+          cd ../../
           pwd
-          git checkout -b docs
-          cp ../docs/en/ addons/modules/connect
-          git add .
-          git commit -m "Update docs file"
-          git push origin docs
+          ls
