@@ -1,26 +1,22 @@
-name: Push to Another GitHub Repository
-on:
-  push:
-    paths:
-      - 'docs/en/**'
+name: Push File
 
-env:
-  TARGET_REPO: MostafaMoradii/openclassify-docs
-  REPO_DIR: openclassify-docs
+on: push
 
 jobs:
-  build:
+  copy-file:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Pushes to another repository
-        uses: cpina/github-action-push-to-another-repository@main
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Pushes test file
+        uses: dmnemec/copy_file_to_another_repo_action@main
         env:
-          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
           API_TOKEN_GITHUB: ${{ secrets.PAT }}
         with:
-          source-directory: 'output'
-          destination-github-username: 'MostafaMoradii'
-          destination-repository-name: 'openclassify-docs'
-          user-email: carles3@pina.cat
-          target-branch: main
+          source_file: 'docs/en/**'
+          destination_repo: 'MostafaMoradii/openclassify-docs'
+          destination_folder: 'addons/modules/connect'
+          user_email: 'mostafa21tr@gmail.com'
+          user_name: 'MostafaMoradii'
+          commit_message: 'A custom message for the commit'
