@@ -98,7 +98,7 @@ class ExceptionHandler extends Handler
 
         if (\request()->is('api/*')) {
 
-            if ($e instanceof AuthenticationException) {
+            if ($e instanceof AuthenticationException or $e instanceof \League\OAuth2\Server\Exception\OAuthServerException) {
                 return $this->unauthenticated(\request(), $e);
             }
 
@@ -136,7 +136,7 @@ class ExceptionHandler extends Handler
         }
     }
 
-    protected function unauthenticated($request, AuthenticationException $exception)
+    protected function unauthenticated($request, $exception)
     {
         if ($request->expectsJson()) {
             return response()->json(['success' => false, 'message' => ['Unauthenticated.']], 401);
