@@ -37,7 +37,35 @@ class ApiController extends ResourceController
         parent::__construct();
     }
 
+
     public function login()
+    {
+        $request_parameters = $this->request->toArray();
+
+        if (isset($request_parameters['email']) && !filter_var(request('email'), FILTER_VALIDATE_EMAIL)) {
+            $request_parameters['username'] = $request_parameters['email'];
+            unset($request_parameters['email']);
+        }
+
+        if ($response = $this->authenticator->authenticate($request_parameters)) {
+            if ($response instanceof UserInterface) {
+
+                if (!$response->isActivated() or !$response->isEnabled()) {
+                    return $this->response->json(['success' => false, 'message' => trans('visiosoft.module.connect::message.disabled_account')], 400);
+                }
+
+                $u_id = $response->id;
+                $response = ['id' => $response->getId()];
+                $response['token'] = app(\Visiosoft\ConnectModule\User\UserModel::class)->find($u_id)->createToken($u_id)->accessToken;
+
+                return $this->response->json($response);
+            }
+        }
+
+        return $this->response->json(['success' => false, 'message' => trans('visiosoft.module.connect::message.error_auth')], 400);
+    }
+
+    public function loginV2()
     {
         $parameters = $this->request->all();
 
