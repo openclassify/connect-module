@@ -65,6 +65,9 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         'admin/connect/edit/{id}' => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@edit',
         'api/forgot-password' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@forgotPassword',
         'api/renew-password' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@renew',
+
+        // Errors
+        'api/error/{code}' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@error',
     ];
 
     /**
