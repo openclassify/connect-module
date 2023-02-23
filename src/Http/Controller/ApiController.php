@@ -425,6 +425,6 @@ class ApiController extends ResourceController
                 trans('streams::error.' . $code . '.name')
             ],
             'error_code' => $code
-        ]);
+        ],$code);
     }
 }
