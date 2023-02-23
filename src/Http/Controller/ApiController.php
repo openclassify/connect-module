@@ -56,13 +56,14 @@ class ApiController extends ResourceController
 
                 $u_id = $response->id;
                 $response = ['id' => $response->getId()];
+                $response['success'] = true;
                 $response['token'] = app(\Visiosoft\ConnectModule\User\UserModel::class)->find($u_id)->createToken($u_id)->accessToken;
 
                 return $this->response->json($response);
             }
         }
 
-        return $this->response->json(['success' => false, 'message' => trans('visiosoft.module.connect::message.error_auth')], 400);
+        return $this->response->json(['success' => false, 'message' => [trans('visiosoft.module.connect::message.error_auth')]], 400);
     }
 
     public function loginV2()
@@ -414,5 +415,16 @@ class ApiController extends ResourceController
         }
 
         return $url . $parameters_prefix . (count($parameters) ? http_build_query($parameters) . "&" . $string_parameters : "&" . $string_parameters);
+    }
+
+    public function error($code)
+    {
+        return $this->response->json([
+            'success' => false,
+            'message' => [
+                trans('streams::error.' . $code . '.name')
+            ],
+            'error_code' => $code
+        ]);
     }
 }
