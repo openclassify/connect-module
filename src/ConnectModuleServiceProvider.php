@@ -57,6 +57,8 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
      * @var array
      */
     protected $routes = [
+        'api/login' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@login',
+        'api/register' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@register',
         'oauth/request' => 'Visiosoft\ConnectModule\Http\Controller\OAuthController@request',
         'admin/connect' => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@index',
         'admin/connect/create' => 'Visiosoft\ConnectModule\Http\Controller\Admin\ClientsController@create',
@@ -218,16 +220,9 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
     public function mapRouters(Router $router)
     {
         $router->post(
-            'api/login',
+            'api/v2/login',
             [
-                'uses' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@login',
-            ]
-        );
-
-        $router->post(
-            'api/register',
-            [
-                'uses' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@register',
+                'uses' => 'Visiosoft\ConnectModule\Http\Controller\ApiController@loginV2',
             ]
         );
     }
