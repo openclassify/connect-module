@@ -56,7 +56,6 @@ class ApiController extends ResourceController
 
                 $u_id = $response->id;
                 $response = ['id' => $response->getId()];
-                $response['success'] = true;
                 $response['token'] = app(\Visiosoft\ConnectModule\User\UserModel::class)->find($u_id)->createToken($u_id)->accessToken;
 
                 return $this->response->json($response);
