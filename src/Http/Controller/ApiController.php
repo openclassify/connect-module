@@ -102,7 +102,7 @@ class ApiController extends ResourceController
 
         // Set username parameter
 
-        $request_parameters = [];
+        $request_parameters = $parameters;
         if ($this->request->grant_type == 'password' && $this->request->has('email')) {
             $parameters['username'] = $this->request->email;
 
@@ -114,6 +114,20 @@ class ApiController extends ResourceController
             $request_parameters = [
                 'refresh_token' => $parameters['refresh_token'],
             ];
+        }
+
+        if (!filter_var($request_parameters['username'], FILTER_VALIDATE_EMAIL)) {
+
+            if (!$search_email = $this->userRepository->findByUsername($request_parameters['username'])) {
+                return $this->response->json([
+                    'success' => false,
+                    'message' => [
+                        trans('visiosoft.module.connect::message.error_auth')
+                    ],
+                ], 400);
+            } else {
+                $request_parameters['username'] = $search_email->getEmail();
+            }
         }
 
         /**
@@ -424,6 +438,6 @@ class ApiController extends ResourceController
                 trans('streams::error.' . $code . '.name')
             ],
             'error_code' => $code
-        ],$code);
+        ], $code);
     }
 }
