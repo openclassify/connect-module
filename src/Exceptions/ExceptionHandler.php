@@ -111,7 +111,7 @@ class ExceptionHandler extends Handler
 
             if (strlen($error_code) > 3 || $error_code == 0) {
                 $message = trans('streams::error.500.name');
-                $error_code = 400;
+                $error_code = 500;
             }
 
             http_response_code($error_code);
