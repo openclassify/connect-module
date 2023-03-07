@@ -108,7 +108,13 @@ class ExceptionHandler extends Handler
 
 
             $message = (!array_value($error_list, $error_code)) ? $e->getMessage() : trans("visiosoft.module.connect::errors." . $error_code);
-            http_response_code(400);
+
+            if (strlen($error_code) > 3 || $error_code == 0) {
+                $message = trans('streams::error.500.name');
+                $error_code = 400;
+            }
+
+            http_response_code($error_code);
             header('Content-Type: application/json; charset=UTF-8', true);
             echo json_encode(['success' => false, 'message' => [$message], 'error_code' => $error_code]);
             die;
