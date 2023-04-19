@@ -130,6 +130,14 @@ class ApiController extends ResourceController
             }
         }
 
+        // Check User Activation
+        if ($userCheck = $this->userRepository->findByEmail($request_parameters['username']))
+        {
+            if (!$userCheck->isActivated() or !$userCheck->isEnabled()) {
+                return $this->response->json(['success' => false, 'message' => trans('visiosoft.module.connect::message.disabled_account')], 400);
+            }
+        }
+
         /**
          * We are making internal request to laravel passport system
          * to support login with email or username.
