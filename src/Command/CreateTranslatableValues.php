@@ -44,7 +44,7 @@ class CreateTranslatableValues
                     $new_parameters[$locale][$key] = $value[$locale];
 
                     if ($key == "slug") {
-                        $new_parameters[$locale][$key] = $value[$locale] . "-" . $this->unique_value;
+                        $new_parameters[$locale][$key] = $value[$locale] . "-" . $this->unique_value."-".$locale;
                     }
                 }
             }
