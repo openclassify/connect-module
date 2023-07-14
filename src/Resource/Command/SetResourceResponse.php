@@ -39,19 +39,19 @@ class SetResourceResponse
         switch (strtolower($this->builder->getResourceOption('format', 'json'))) {
 
             case 'json':
-                $response = $this->dispatch(new MakeJsonResponse($this->builder));
+                $response = $this->dispatchSync(new MakeJsonResponse($this->builder));
                 break;
 
             case 'xml':
-                $response = $this->dispatch(new MakeXmlResponse($this->builder));
+                $response = $this->dispatchSync(new MakeXmlResponse($this->builder));
                 break;
 
             case 'html':
-                $response = $this->dispatch(new MakeViewResponse($this->builder));
+                $response = $this->dispatchSync(new MakeViewResponse($this->builder));
                 break;
 
             default:
-                $response = $this->dispatch(new MakeViewResponse($this->builder));
+                $response = $this->dispatchSync(new MakeViewResponse($this->builder));
         }
 
         $this->builder->setResourceResponse($response);

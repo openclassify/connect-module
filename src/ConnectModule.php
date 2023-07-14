@@ -51,7 +51,7 @@ class ConnectModule extends Module
             ]
         );
 
-        $this->dispatch(new GenerateKeys());
+        $this->dispatchSync(new GenerateKeys());
     }
 
     /**
@@ -69,6 +69,6 @@ class ConnectModule extends Module
             ]
         );
 
-        $this->dispatch(new DeleteKeys());
+        $this->dispatchSync(new DeleteKeys());
     }
 }

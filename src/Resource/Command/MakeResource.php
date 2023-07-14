@@ -53,7 +53,7 @@ class MakeResource
 
         // Make sure entries are in there.
         if (!$this->builder->getResourceDataItem('entries')) {
-            $this->dispatch(new AddEntriesData($this->builder));
+            $this->dispatchSync(new AddEntriesData($this->builder));
         }
     }
 }

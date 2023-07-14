@@ -116,7 +116,7 @@ class ApiController extends ResourceController
             ];
         }
 
-        if (!filter_var($request_parameters['username'], FILTER_VALIDATE_EMAIL)) {
+        if (isset($request_parameters['username']) and !filter_var($request_parameters['username'], FILTER_VALIDATE_EMAIL)) {
 
             if (!$search_email = $this->userRepository->findByUsername($request_parameters['username'])) {
                 return $this->response->json([
@@ -131,7 +131,7 @@ class ApiController extends ResourceController
         }
 
         // Check User Activation
-        if ($userCheck = $this->userRepository->findByEmail($request_parameters['username']))
+        if (isset($request_parameters['username']) and $userCheck = $this->userRepository->findByEmail($request_parameters['username']))
         {
             if (!$userCheck->isActivated() or !$userCheck->isEnabled()) {
                 return $this->response->json(['success' => false, 'message' => trans('visiosoft.module.connect::message.disabled_account')], 400);
@@ -143,6 +143,7 @@ class ApiController extends ResourceController
          * to support login with email or username.
          */
         try {
+
             $http = new \GuzzleHttp\Client();
             $response = $http->post(
                 url('oauth/token'),

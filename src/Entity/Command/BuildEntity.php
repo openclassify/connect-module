@@ -45,38 +45,38 @@ class BuildEntity
          * Setup some objects and options using
          * provided input or sensible defaults.
          */
-        $this->dispatch(new SetEntityModel($this->builder));
-        $this->dispatch(new SetEntityStream($this->builder));
-        $this->dispatch(new SetDefaultParameters($this->builder));
-        $this->dispatch(new SetRepository($this->builder));
+        $this->dispatchSync(new SetEntityModel($this->builder));
+        $this->dispatchSync(new SetEntityStream($this->builder));
+        $this->dispatchSync(new SetDefaultParameters($this->builder));
+        $this->dispatchSync(new SetRepository($this->builder));
 
-        $this->dispatch(new SetEntityOptions($this->builder));
-        $this->dispatch(new SetEntityEntry($this->builder)); // Do this last.
+        $this->dispatchSync(new SetEntityOptions($this->builder));
+        $this->dispatchSync(new SetEntityEntry($this->builder)); // Do this last.
 
         /**
          * Before we go any further, authorize the request.
          */
-        $this->dispatch(new AuthorizeEntity($this->builder));
+        $this->dispatchSync(new AuthorizeEntity($this->builder));
 
         /*
          * Build entity fields.
          */
-        $this->dispatch(new BuildFields($this->builder));
+        $this->dispatchSync(new BuildFields($this->builder));
 
         /**
          * Build entity sections.
          */
-        $this->dispatch(new BuildSections($this->builder));
+        $this->dispatchSync(new BuildSections($this->builder));
 
         /**
          * Build entity actions and flag active.
          */
-        $this->dispatch(new BuildActions($this->builder));
-        $this->dispatch(new SetActiveAction($this->builder));
+        $this->dispatchSync(new BuildActions($this->builder));
+        $this->dispatchSync(new SetActiveAction($this->builder));
 
         /**
          * Build entity buttons.
          */
-        $this->dispatch(new BuildButtons($this->builder));
+        $this->dispatchSync(new BuildButtons($this->builder));
     }
 }

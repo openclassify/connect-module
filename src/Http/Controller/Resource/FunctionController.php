@@ -35,12 +35,12 @@ class FunctionController extends ResourceController
             $this->route->parameter('namespace')
         );
 
-        $repository = $this->dispatch(new GetRepository($stream->getEntryModelName()));
+        $repository = $this->dispatchSync(new GetRepository($stream->getEntryModelName()));
 
         $function = $this->route->parameter('function');
 
         $parameters = $this->getOption('parameters', []);
-        
+
         $entry = call_user_func([$repository, camel_case($function)], $parameters);
 
         return $this->response->json(['status' => ($entry) ? true : false, 'response' => (!is_bool($entry) ? $entry : null)]);

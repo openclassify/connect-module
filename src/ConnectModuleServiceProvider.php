@@ -119,8 +119,8 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
      */
     public function boot()
     {
-        $this->dispatch(new LoadKeys());
-        $this->dispatch(new LoadScopes());
+        $this->dispatchSync(new LoadKeys());
+        $this->dispatchSync(new LoadScopes());
     }
 
     /**

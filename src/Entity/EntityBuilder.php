@@ -164,7 +164,7 @@ class EntityBuilder
 
         $this->fire('ready', ['builder' => $this]);
 
-        $this->dispatch(new BuildEntity($this));
+        $this->dispatchSync(new BuildEntity($this));
 
         return $this;
     }
@@ -181,9 +181,9 @@ class EntityBuilder
         $this->post();
 
         if ($this->getEntityResponse() === null) {
-            $this->dispatch(new LoadEntity($this));
-            $this->dispatch(new AddAssets($this));
-            $this->dispatch(new MakeEntity($this));
+            $this->dispatchSync(new LoadEntity($this));
+            $this->dispatchSync(new AddAssets($this));
+            $this->dispatchSync(new MakeEntity($this));
         }
 
         return $this;
@@ -214,9 +214,9 @@ class EntityBuilder
     public function post()
     {
         if (app('request')->isMethod('post')) {
-            $this->dispatch(new PostEntity($this));
+            $this->dispatchSync(new PostEntity($this));
         } else {
-            $this->dispatch(new PopulateFields($this));
+            $this->dispatchSync(new PopulateFields($this));
         }
 
         return $this;
@@ -233,7 +233,7 @@ class EntityBuilder
         $this->make($entry);
 
         if (!$this->entity->getResponse()) {
-            $this->dispatch(new SetEntityResponse($this));
+            $this->dispatchSync(new SetEntityResponse($this));
         }
 
         return $this->entity->getResponse();
@@ -258,7 +258,7 @@ class EntityBuilder
      */
     public function saveEntity()
     {
-        $this->dispatch(new SaveEntity($this));
+        $this->dispatchSync(new SaveEntity($this));
     }
 
     /**

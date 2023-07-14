@@ -98,6 +98,7 @@ class ExceptionHandler extends Handler
 
         if (\request()->is('api/*')) {
 
+            dd($e->getMessage());
             if ($e instanceof AuthenticationException or $e instanceof \League\OAuth2\Server\Exception\OAuthServerException) {
                 return $this->unauthenticated(\request(), $e);
             }

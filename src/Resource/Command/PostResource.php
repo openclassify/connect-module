@@ -48,7 +48,7 @@ class PostResource
             return;
         }
 
-        $this->dispatch(new ExecuteAction($this->builder));
+        $this->dispatchSync(new ExecuteAction($this->builder));
 
         if (!$this->builder->getResourceResponse()) {
             $this->builder->setResourceResponse($response->redirectTo($request->fullUrl()));
