@@ -113,9 +113,9 @@ class EntityValidator
                 ->setSave(false)
                 ->setEntityErrors($validator->getMessageBag());
 
-            $this->dispatch(new SetErrorMessages($builder));
+            $this->dispatchSync(new SetErrorMessages($builder));
         }
 
-        $this->dispatch(new RepopulateFields($builder));
+        $this->dispatchSync(new RepopulateFields($builder));
     }
 }

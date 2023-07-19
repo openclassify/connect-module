@@ -130,7 +130,7 @@ class ResourceBuilder
 
         $this->fire('ready', ['builder' => $this]);
 
-        $this->dispatch(new BuildResource($this));
+        $this->dispatchSync(new BuildResource($this));
     }
 
     /**
@@ -143,7 +143,7 @@ class ResourceBuilder
     {
         $this->build($namespace, $stream);
 
-        $this->dispatch(new MakeResource($this));
+        $this->dispatchSync(new MakeResource($this));
     }
 
     /**
@@ -157,7 +157,7 @@ class ResourceBuilder
     {
         $this->make($namespace, $stream);
 
-        $this->dispatch(new SetResourceResponse($this));
+        $this->dispatchSync(new SetResourceResponse($this));
 
         return $this->resource->getResponse();
     }

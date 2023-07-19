@@ -46,7 +46,7 @@ class EntriesController extends ResourceController
             $this->route->parameter('namespace')
         );
 
-        $repository = $this->dispatch(new GetRepository($stream->getEntryModelName()));
+        $repository = $this->dispatchSync(new GetRepository($stream->getEntryModelName()));
 
         $search_type = $this->getOption('search_type');
         $search_function = $this->getOption('search_function');

@@ -40,29 +40,29 @@ class BuildResource
         /**
          * Resolve and set the resource model and stream.
          */
-        $this->dispatch(new HydrateFromRequest($this->builder));
-        $this->dispatch(new SetResourceModel($this->builder));
-        $this->dispatch(new SetResourceStream($this->builder));
-        $this->dispatch(new SetDefaultParameters($this->builder));
-        $this->dispatch(new SetRepository($this->builder));
+        $this->dispatchSync(new HydrateFromRequest($this->builder));
+        $this->dispatchSync(new SetResourceModel($this->builder));
+        $this->dispatchSync(new SetResourceStream($this->builder));
+        $this->dispatchSync(new SetDefaultParameters($this->builder));
+        $this->dispatchSync(new SetRepository($this->builder));
 
-        $this->dispatch(new SetResourceOptions($this->builder));
-        $this->dispatch(new SetDefaultOptions($this->builder));
+        $this->dispatchSync(new SetResourceOptions($this->builder));
+        $this->dispatchSync(new SetDefaultOptions($this->builder));
 
         /**
          * Before we go any further, authorize the request.
          */
-        $this->dispatch(new AuthorizeResource($this->builder));
+        $this->dispatchSync(new AuthorizeResource($this->builder));
 
         /**
          * Get resource entries.
          */
-        $this->dispatch(new GetResourceEntries($this->builder));
+        $this->dispatchSync(new GetResourceEntries($this->builder));
 
         /**
          * Lastly resource results.
          */
-        $this->dispatch(new BuildResults($this->builder));
+        $this->dispatchSync(new BuildResults($this->builder));
 
     }
 }

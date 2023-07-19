@@ -39,15 +39,15 @@ class PostEntity
         $this->builder->fire('posting', ['builder' => $this->builder]);
         $this->builder->fireFieldEvents('entity_posting');
 
-        $this->dispatch(new LoadEntityValues($this->builder));
-        $this->dispatch(new ValidateEntity($this->builder));
-        $this->dispatch(new RemoveSkippedFields($this->builder));
-        $this->dispatch(new HandleEntity($this->builder));
-        $this->dispatch(new SetSuccessMessage($this->builder));
-        $this->dispatch(new SetActionResponse($this->builder));
+        $this->dispatchSync(new LoadEntityValues($this->builder));
+        $this->dispatchSync(new ValidateEntity($this->builder));
+        $this->dispatchSync(new RemoveSkippedFields($this->builder));
+        $this->dispatchSync(new HandleEntity($this->builder));
+        $this->dispatchSync(new SetSuccessMessage($this->builder));
+        $this->dispatchSync(new SetActionResponse($this->builder));
 
         if ($this->builder->isAjax()) {
-            $this->dispatch(new SetJsonResponse($this->builder));
+            $this->dispatchSync(new SetJsonResponse($this->builder));
         }
 
         $this->builder->fire('posted', ['builder' => $this->builder]);

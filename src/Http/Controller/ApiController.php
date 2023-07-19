@@ -12,11 +12,9 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
-use Visiosoft\ConnectModule\Command\CheckRequiredParams;
 use Visiosoft\ConnectModule\Events\ActivateAccount;
 use Visiosoft\ConnectModule\Events\ResetPassword;
 use Visiosoft\ConnectModule\Events\UserRegistered;
-use Visiosoft\ConnectModule\Notification\ResetYourPassword;
 
 
 class ApiController extends ResourceController
@@ -116,7 +114,7 @@ class ApiController extends ResourceController
             ];
         }
 
-        if (!filter_var($request_parameters['username'], FILTER_VALIDATE_EMAIL)) {
+        if (isset($request_parameters['username']) and !filter_var($request_parameters['username'], FILTER_VALIDATE_EMAIL)) {
 
             if (!$search_email = $this->userRepository->findByUsername($request_parameters['username'])) {
                 return $this->response->json([
@@ -131,8 +129,7 @@ class ApiController extends ResourceController
         }
 
         // Check User Activation
-        if ($userCheck = $this->userRepository->findByEmail($request_parameters['username']))
-        {
+        if (isset($request_parameters['username']) and $userCheck = $this->userRepository->findByEmail($request_parameters['username'])) {
             if (!$userCheck->isActivated() or !$userCheck->isEnabled()) {
                 return $this->response->json(['success' => false, 'message' => trans('visiosoft.module.connect::message.disabled_account')], 400);
             }
@@ -143,6 +140,7 @@ class ApiController extends ResourceController
          * to support login with email or username.
          */
         try {
+
             $http = new \GuzzleHttp\Client();
             $response = $http->post(
                 url('oauth/token'),
@@ -197,11 +195,11 @@ class ApiController extends ResourceController
             }
 
             try {
-
-                if (!$user = $users->findByEmail($this->request->email)) {
+                $email = strtolower($this->request->email);
+                if (!$user = $users->findByEmail($email)) {
 
                     $create_parameters = [
-                        'email' => $this->request->email,
+                        'email' => $email,
                         'created_at' => Carbon::now(),
                         'str_id' => str_random(24),
                         'username' => $this->request->username,
@@ -281,8 +279,9 @@ class ApiController extends ResourceController
             $success = $encrypter->decrypt($this->request->get('success-verification'));
             $error = $encrypter->decrypt($this->request->get('error-verification'));
 
+            $email = strtolower($this->request->email);
 
-            if ($user = $users->findBy('email', $encrypter->decrypt($this->request->email))
+            if ($user = $users->findBy('email', $encrypter->decrypt($email))
                 and $activator->activate($user, $encrypter->decrypt($this->request->token))) {
 
                 $user->setAttribute('enabled', true);
@@ -325,8 +324,9 @@ class ApiController extends ResourceController
 
             try {
                 $password = app(UserPassword::class);
+                $email = strtolower($this->request->email);
 
-                if (!$user = $users->findByEmail($this->request->email)) {
+                if (!$user = $users->findByEmail($email)) {
                     throw new \Exception(trans('anomaly.module.users::error.reset_password'));
                 }
 
@@ -341,8 +341,6 @@ class ApiController extends ResourceController
                 $url = url('api/forgot-password') . '?' . http_build_query($parameters);
 
                 event(new ResetPassword($user, $url));
-
-                //$user->notify(new ResetYourPassword($url));
 
                 return ['success' => true];
 
@@ -365,12 +363,13 @@ class ApiController extends ResourceController
 
         // Redirect Request
         try {
+            $email = strtolower($this->request->email);
             $callback = $encrypter->decrypt($this->request->redirect);
 
             $success = $encrypter->decrypt($this->request->get('success-verification'));
             $error = $encrypter->decrypt($this->request->get('error-verification'));
 
-            if ($user = $users->findBy('email', $encrypter->decrypt($this->request->email))) {
+            if ($user = $users->findBy('email', $encrypter->decrypt($email))) {
                 $callback = $this->generateCallback($callback, ['code' => $this->request->token], $success);
             } else {
                 $callback = $this->generateCallback($callback, [], $error);

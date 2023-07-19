@@ -49,10 +49,10 @@ class MultipleEntityBuilder extends EntityBuilder
      */
     public function build($entry = null)
     {
-        $this->dispatch(new BuildEntities($this));
-        $this->dispatch(new PostEntities($this));
-        $this->dispatch(new MergeFields($this));
-        $this->dispatch(new HandleErrors($this));
+        $this->dispatchSync(new BuildEntities($this));
+        $this->dispatchSync(new PostEntities($this));
+        $this->dispatchSync(new MergeFields($this));
+        $this->dispatchSync(new HandleErrors($this));
 
         parent::build($entry);
     }
