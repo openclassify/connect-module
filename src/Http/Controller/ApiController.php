@@ -12,11 +12,9 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
-use Visiosoft\ConnectModule\Command\CheckRequiredParams;
 use Visiosoft\ConnectModule\Events\ActivateAccount;
 use Visiosoft\ConnectModule\Events\ResetPassword;
 use Visiosoft\ConnectModule\Events\UserRegistered;
-use Visiosoft\ConnectModule\Notification\ResetYourPassword;
 
 
 class ApiController extends ResourceController
@@ -45,6 +43,8 @@ class ApiController extends ResourceController
         if (isset($request_parameters['email']) && !filter_var(request('email'), FILTER_VALIDATE_EMAIL)) {
             $request_parameters['username'] = $request_parameters['email'];
             unset($request_parameters['email']);
+        }else {
+            $request_parameters['email'] = strtolower($request_parameters['email']);
         }
 
         if ($response = $this->authenticator->authenticate($request_parameters)) {
@@ -101,7 +101,6 @@ class ApiController extends ResourceController
         }
 
         // Set username parameter
-
         $request_parameters = $parameters;
         if ($this->request->grant_type == 'password' && $this->request->has('email')) {
             $parameters['username'] = $this->request->email;
@@ -116,6 +115,7 @@ class ApiController extends ResourceController
             ];
         }
 
+        $request_parameters['username'] = strtolower($request_parameters['username']);
         if (isset($request_parameters['username']) and !filter_var($request_parameters['username'], FILTER_VALIDATE_EMAIL)) {
 
             if (!$search_email = $this->userRepository->findByUsername($request_parameters['username'])) {
@@ -343,8 +343,6 @@ class ApiController extends ResourceController
                 $url = url('api/forgot-password') . '?' . http_build_query($parameters);
 
                 event(new ResetPassword($user, $url));
-
-                //$user->notify(new ResetYourPassword($url));
 
                 return ['success' => true];
 
