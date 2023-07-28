@@ -6,7 +6,6 @@ use Illuminate\Contracts\Routing\ResponseFactory;
 /**
  * Class MakeJsonResponse
  *
-
  * @package       Visiosoft\ConnectModule\Resource\Command
  */
 class MakeJsonResponse
@@ -36,6 +35,11 @@ class MakeJsonResponse
      */
     public function handle(ResponseFactory $response)
     {
+        $data = $this->builder->getResourceEntries();
+
+        if (is_array($data) && !count($data)) {
+            return $response->json(['data' => $data]);
+        }
         return $response->json($this->builder->getResourceData());
     }
 }
