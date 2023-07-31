@@ -522,10 +522,9 @@ class ResourceBuilder
     /**
      * Set the resource entries.
      *
-     * @param Collection $entries
      * @return $this
      */
-    public function setResourceEntries(Collection $entries)
+    public function setResourceEntries($entries)
     {
         $this->resource->setEntries($entries);
 

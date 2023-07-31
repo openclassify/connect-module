@@ -97,10 +97,9 @@ class GetResourceEntries
             $entries = $entries->get();
         }
 
-        if (!$entries) {
+        if (!is_array($entries) && !$entries) {
             $entries = new Collection();
         }
-
 
         /**
          * Traverse the resource if a map is present.

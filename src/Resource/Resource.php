@@ -270,7 +270,7 @@ class Resource
      * @param Collection $entries
      * @return $this
      */
-    public function setEntries(Collection $entries)
+    public function setEntries($entries)
     {
         $this->entries = $entries;
 
