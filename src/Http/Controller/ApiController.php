@@ -363,13 +363,14 @@ class ApiController extends ResourceController
 
         // Redirect Request
         try {
-            $email = strtolower($this->request->email);
+            $email = $this->request->email;
             $callback = $encrypter->decrypt($this->request->redirect);
 
             $success = $encrypter->decrypt($this->request->get('success-verification'));
             $error = $encrypter->decrypt($this->request->get('error-verification'));
 
-            if ($user = $users->findBy('email', $encrypter->decrypt($email))) {
+            $email = $encrypter->decrypt($email);
+            if ($users->findBy('email', strtolower($email))) {
                 $callback = $this->generateCallback($callback, ['code' => $this->request->token], $success);
             } else {
                 $callback = $this->generateCallback($callback, [], $error);
