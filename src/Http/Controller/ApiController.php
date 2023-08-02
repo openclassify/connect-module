@@ -279,9 +279,9 @@ class ApiController extends ResourceController
             $success = $encrypter->decrypt($this->request->get('success-verification'));
             $error = $encrypter->decrypt($this->request->get('error-verification'));
 
-            $email = strtolower($this->request->email);
+            $email = $encrypter->decrypt($this->request->email);
 
-            if ($user = $users->findBy('email', $encrypter->decrypt($email))
+            if ($user = $users->findBy('email', strtolower($email))
                 and $activator->activate($user, $encrypter->decrypt($this->request->token))) {
 
                 $user->setAttribute('enabled', true);
