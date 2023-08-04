@@ -96,7 +96,7 @@ class ExceptionHandler extends Handler
             die;
         }
 
-        if (\request()->is('api/*')) {
+        if (\request()->is('api/*') or \request()->is('oauth-api/*')) {
             if ($e instanceof AuthenticationException or $e instanceof \League\OAuth2\Server\Exception\OAuthServerException) {
                 return $this->unauthenticated(\request(), $e);
             }
@@ -104,7 +104,6 @@ class ExceptionHandler extends Handler
             $error_code = $e->getCode();
 
             $error_list = trans("visiosoft.module.connect::errors");
-
 
             $message = (!array_value($error_list, $error_code)) ? $e->getMessage() : trans("visiosoft.module.connect::errors." . $error_code);
 
