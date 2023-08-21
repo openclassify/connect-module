@@ -110,7 +110,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
             Passport::refreshTokensExpireIn(Carbon::now()->addMonth(7));
         } else {
             Passport::tokensExpireIn(Carbon::now()->addDay(7));
-            Passport::refreshTokensExpireIn(Carbon::now()->addDay(7));
+            Passport::refreshTokensExpireIn(Carbon::now()->addDay(14));
         }
     }
 
