@@ -104,7 +104,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         );
 
         // Set Expire Time
-        Passport::routes();
+        Passport::ignoreRoutes();
         if ($request->has('device_type') && $request->get('device_type') == 'mobile') {
             Passport::tokensExpireIn(Carbon::now()->addMonth(6));
             Passport::refreshTokensExpireIn(Carbon::now()->addMonth(7));

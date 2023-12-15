@@ -57,8 +57,9 @@ class PassportServiceProvider extends IlluminatePassportServiceProvider
                     new PassportUserProvider(Auth::createUserProvider($config['provider']), $config['provider']),
                     $this->app->make(TokenRepository::class),
                     $this->app->make(ClientRepository::class),
-                    $this->app->make('encrypter')
-                ))->user($request);
+                    $this->app->make('encrypter'),
+                    $request
+                ))->user();
             }, $this->app['request']
         );
     }

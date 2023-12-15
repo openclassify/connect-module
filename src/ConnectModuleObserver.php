@@ -19,6 +19,6 @@ class ConnectModuleObserver extends Observer
      */
     public function saved(EntryInterface $entry)
     {
-        dispatch_now(new PurgeHttpCache($entry));
+        dispatch_sync(new PurgeHttpCache($entry));
     }
 }
