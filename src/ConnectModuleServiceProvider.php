@@ -134,7 +134,7 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         $this->mapStreamsApi($router);
         $this->mapEntriesApi($router);
 
-        Passport::routes();
+        Passport::ignoreRoutes();
     }
 
     /**
