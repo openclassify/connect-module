@@ -42,12 +42,7 @@ class PurgeHttpCache
 
         $stream    = $this->entry->getStreamSlug();
         $namespace = $this->entry->getStreamNamespace();
-dd(array_filter(
-    [
-        "api/entries/{$namespace}/{$stream}",
-        "api/entries/{$namespace}/{$stream}/{id}",
-    ]
-));
+
         array_map(
             function ($route) use ($cache) {
                 $cache->purge(parse_url($route, PHP_URL_PATH));

@@ -121,29 +121,19 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
 
     public function getRepositoryFunctions($model, $function_name, array $params = [])
     {
+        $collection_class = $this->getApiCollectionWithModel($this->model);
 
-        try {
+        // Default set Repository
+        $class = app($this->getRepositoryWithModel($model));
 
-            $collection_class = $this->getApiCollectionWithModel($this->model);
+        if (class_exists($collection_class)) {
 
-            // Default set Repository
-            $class = app($this->getRepositoryWithModel($model));
-
-            if (class_exists($collection_class)) {
-
-                // Set ApiCollection
-                $class = app($collection_class);
-            }
-
-
-            return call_user_func([$class, camel_case($function_name)], $params);
-
-
-        } catch (\Exception $exception) {
-            header('Content-Type: application/json');
-            echo json_encode(['status' => false, 'message' => $exception->getMessage()]);
-            die;
+            // Set ApiCollection
+            $class = app($collection_class);
         }
+
+
+        return call_user_func([$class, camel_case($function_name)], $params);
     }
 
     public function returnRaw($raw, $builder)
@@ -171,7 +161,7 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
          */
         $offset = $limit * (app('request')->get('page', 1) - 1);
 
-        if ($builder->getOption('paginate',true)) {
+        if ($builder->getOption('paginate', true)) {
             $query .= " LIMIT " . $limit . " OFFSET " . $offset;
         }
 
@@ -253,7 +243,7 @@ class EloquentResourceRepository implements ResourceRepositoryInterface
          */
         $offset = $limit * (app('request')->get('page', 1) - 1);
 
-        if ($builder->getOption('paginate',true)) {
+        if ($builder->getOption('paginate', true)) {
             $query->take($limit)->offset($offset);
         }
 
