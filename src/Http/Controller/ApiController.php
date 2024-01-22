@@ -233,6 +233,8 @@ class ApiController extends ResourceController
 
                 $user->setAttribute('activation_code', str_random(40));
                 $user->save();
+                event(new UserRegistered($user));
+
 
                 $parameters['token'] = $encrypter->encrypt($user->getActivationCode());
                 $parameters['success-verification'] = $encrypter->encrypt($this->request->get('success-params'));
@@ -242,6 +244,8 @@ class ApiController extends ResourceController
 
                 $url = url('api/register') . '?' . http_build_query($parameters);
 
+                //TODO::Unrelaible event. If one of the listeners throws an error, the flow is interrupted.
+                // NEED ERROR HANDLING.
                 event(new ActivateAccount($user, $url));
 //                $user->notify(new ActivateYourAccount($url));
 
