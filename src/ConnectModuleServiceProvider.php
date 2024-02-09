@@ -1,5 +1,6 @@
 <?php namespace Visiosoft\ConnectModule;
 
+use Anomaly\Streams\Platform\Application\Event\ApplicationHasLoaded;
 use Carbon\Carbon;
 use Visiosoft\ConnectModule\Command\LoadKeys;
 use Visiosoft\ConnectModule\Command\LoadScopes;
@@ -8,6 +9,7 @@ use Visiosoft\ConnectModule\Events\ResetPassword;
 use Visiosoft\ConnectModule\Http\Middleware\SetLocaleMiddleware;
 use Visiosoft\ConnectModule\Listeners\SendActivationMail;
 use Visiosoft\ConnectModule\Listeners\SendResetMail;
+use Visiosoft\ConnectModule\Listeners\UpdateLastActivity;
 use Visiosoft\ConnectModule\Passport\PassportServiceProvider;
 use Visiosoft\ConnectModule\User\UserModel;
 use Anomaly\Streams\Platform\Addon\AddonServiceProvider;
@@ -297,6 +299,9 @@ class ConnectModuleServiceProvider extends AddonServiceProvider
         ],
         ResetPassword::class => [
             SendResetMail::class,
+        ],
+        ApplicationHasLoaded::class => [
+            UpdateLastActivity::class,
         ],
     ];
 
